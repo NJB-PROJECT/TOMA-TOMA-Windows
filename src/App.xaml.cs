@@ -8,11 +8,32 @@ using System.Text.Json;
 namespace Toma.Windows;
 public partial class App : System.Windows.Application
 {
+    private readonly UpdateClient updates = new();private readonly System.Windows.Threading.DispatcherTimer updateTimer = new() { Interval = TimeSpan.FromMinutes(15) };private bool checkingUpdate, updateBlocked;private readonly CancellationTokenSource updateCancel = new();
     private PlayerState? state; private MainWindow? main; private IslandWindow? island; private System.Windows.Forms.NotifyIcon? tray; private Mutex? single;
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        ShutdownMode = ShutdownMode.OnExplicitShutdown;
         DispatcherUnhandledException += (_, error) => { FileLog.Write(error.Exception.ToString()); System.Windows.MessageBox.Show("Ada kendala. Detail disimpan di app.log pada folder data TOMA TOMA.", "TOMA TOMA"); error.Handled = true; };
+        if (e.Args.Contains("--update-probe"))
+        {
+            int at = Array.IndexOf(e.Args, "--update-probe");
+            if (e.Args.Length < at + 3) { Shutdown(2); return; }
+            string output = Path.GetFullPath(e.Args[at + 1]);
+            Directory.CreateDirectory(Path.GetDirectoryName(output)!);
+            var probe = new UpdateClient(storage: Path.Combine(Path.GetDirectoryName(output)!, "update-probe-cache"), current: UpdateClient.ReadVersion(e.Args[at + 2]));
+            var candidate = await probe.Check(CancellationToken.None);
+            string? installerPath = null;
+            if (candidate != null && e.Args.Contains("--download")) installerPath = await probe.Download(candidate, null, CancellationToken.None);
+            File.WriteAllText(output, JsonSerializer.Serialize(new { Current = probe.Current.ToString(), UpdateRequired = candidate != null, Release = candidate, InstallerPath = installerPath, probe.CheckStatus }, new JsonSerializerOptions { WriteIndented = true }));
+            Shutdown(); return;
+        }
+        if (e.Args.Contains("--update-preview"))
+        {
+            var preview = new UpdateClient(storage: Path.Combine(Path.GetTempPath(), "TomaTomaUpdatePreview"), current: new Version(1, 5, 0));
+            var gate = new UpdateWindow(preview) { Title = "TOMA TOMA · Preview update (simulasi versi 1.5.0)" };
+            gate.ShowDialog(); Shutdown(); return;
+        }
         if (e.Args.Contains("--showcase"))
         {
             int at = Array.IndexOf(e.Args, "--showcase");
@@ -86,6 +107,8 @@ public partial class App : System.Windows.Application
             Shutdown();
             return;
         }
+        var update = new UpdateWindow(updates);update.ShowDialog();
+        if (update.Decision != UpdateDecision.Continue) { single.Dispose();Shutdown();return; }
         state = new();
         island = new IslandWindow(state, OpenMain);
         main = new MainWindow(state, island);
@@ -95,6 +118,7 @@ public partial class App : System.Windows.Application
         menu.Items.Add("Tampilkan island", null, (_, _) => Dispatcher.Invoke(() => { state.Settings.Island = true; Storage.Save(state.Settings); island.Show(); island.Reposition(); }));
         menu.Items.Add("Sembunyikan island", null, (_, _) => Dispatcher.Invoke(() => { state.Settings.Island = false; Storage.Save(state.Settings); island.Hide(); }));
         menu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
+        menu.Items.Add("Periksa pembaruan", null, async (_, _) => await CheckUpdates(true));
         menu.Items.Add("Keluar", null, (_, _) => Dispatcher.Invoke(ExitApp));
         tray = new System.Windows.Forms.NotifyIcon { Icon = System.Drawing.Icon.ExtractAssociatedIcon(Environment.ProcessPath!) ?? System.Drawing.SystemIcons.Application, Text = "TOMA TOMA · Auto Lyrics", ContextMenuStrip = menu, Visible = true };
         tray.DoubleClick += (_, _) => Dispatcher.Invoke(OpenMain);
@@ -102,10 +126,23 @@ public partial class App : System.Windows.Application
         if (state.Settings.Island)
             island.Show();
         await state.Start();
+        updateTimer.Tick += async (_, _) => await CheckUpdates(false);updateTimer.Start();
+    }
+    private async Task CheckUpdates(bool manual)
+    {
+        if (checkingUpdate) return;checkingUpdate = true;
+        try
+        {
+            var available = await updates.Check(updateCancel.Token);
+            if (available == null) { if (manual) MessageBox.Show(main!, updates.CheckStatus + "\nVersi terpasang: " + updates.Current.ToString(3), "Pembaruan");return; }
+            updateBlocked = true;updateTimer.Stop();if (tray != null) tray.Visible = false;island?.Hide();main?.Hide();state?.PrepareForUpdate();var gate = new UpdateWindow(updates, available);gate.ShowDialog();ExitApp();
+        }
+        catch (OperationCanceledException) { }
+        finally { checkingUpdate = false; }
     }
     private void OpenMain()
     {
-        if (main == null)
+        if (main == null || updateBlocked)
             return;
         main.Show();
         main.WindowState = WindowState.Normal;
@@ -113,6 +150,7 @@ public partial class App : System.Windows.Application
     }
     private void ExitApp()
     {
+        updateTimer.Stop();updateCancel.Cancel();
         tray?.Dispose();
         state?.Dispose();
         if (main != null)

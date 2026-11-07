@@ -1,0 +1,55 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+  <Package Name="TOMA TOMA Windows" Manufacturer="NJB-PROJECT" Version="$(var.AppVersion)" UpgradeCode="95ECDE5D-49BC-4B39-9E9C-9F7740EF1561" Scope="perUser" InstallerVersion="500" Compressed="yes">
+    <MajorUpgrade DowngradeErrorMessage="Versi TOMA TOMA yang lebih baru sudah terpasang." Schedule="afterInstallInitialize" />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+    <Property Id="ARPPRODUCTICON" Value="TomaIcon" />
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/NJB-PROJECT/TOMA-TOMA-Windows" />
+    <Property Id="ARPURLUPDATEINFO" Value="https://github.com/NJB-PROJECT/TOMA-TOMA-Windows/releases/latest" />
+    <Property Id="CREATESHORTCUTS" Value="1" Secure="yes" />
+    <Icon Id="TomaIcon" SourceFile="$(var.ProjectRoot)\src\Assets\Toma.ico" />
+    <StandardDirectory Id="LocalAppDataFolder">
+      <Directory Id="UserProgramsRoot" Name="Programs">
+        <Directory Id="INSTALLFOLDER" Name="TOMA TOMA">
+          <Component Id="MainFiles" Guid="FCF71619-47FB-48BD-8E90-2C14A19EB03C">
+            <File Id="TomaExe" Source="$(var.Payload)\TOMA TOMA.exe" />
+            <File Source="$(var.ProjectRoot)\LICENSE" />
+            <File Source="$(var.ProjectRoot)\NAudio-LICENSE.txt" />
+            <File Source="$(var.Payload)\DOTNET-LICENSE.txt" />
+            <File Source="$(var.Payload)\DOTNET-THIRD-PARTY-NOTICES.txt" />
+            <File Source="$(var.ProjectRoot)\THIRD_PARTY_NOTICES.md" />
+            <File Source="$(var.ProjectRoot)\PRIVACY.md" />
+            <RegistryValue Root="HKCU" Key="Software\NJB-PROJECT\TomaTomaWindows" Name="InstalledVersion" Value="$(var.AppVersion)" Type="string" KeyPath="yes" />
+            <RemoveFolder Id="RemoveInstallFolder" On="uninstall" />
+          </Component>
+        </Directory>
+      </Directory>
+    </StandardDirectory>
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="TomaMenu" Name="TOMA TOMA">
+        <Component Id="MenuShortcuts" Guid="5479BD8A-E41F-4903-AD59-3B3E07558D30" Condition="CREATESHORTCUTS = 1">
+          <Shortcut Id="StartMenuShortcut" Name="TOMA TOMA Windows" Target="[#TomaExe]" WorkingDirectory="INSTALLFOLDER" Icon="TomaIcon" />
+          <Shortcut Id="UninstallShortcut" Name="Uninstall TOMA TOMA" Target="[SystemFolder]msiexec.exe" Arguments="/x [ProductCode]" />
+          <RegistryValue Root="HKCU" Key="Software\NJB-PROJECT\TomaTomaWindows" Name="MenuShortcut" Value="1" Type="integer" KeyPath="yes" />
+          <RemoveFolder Id="RemoveStartMenuFolder" On="uninstall" />
+        </Component>
+      </Directory>
+    </StandardDirectory>
+    <StandardDirectory Id="DesktopFolder">
+      <Component Id="DesktopShortcut" Guid="F0C0782B-6C82-422E-B91F-5D674A4DB4DD" Condition="CREATESHORTCUTS = 1">
+        <Shortcut Id="DesktopLink" Name="TOMA TOMA Windows" Target="[#TomaExe]" WorkingDirectory="INSTALLFOLDER" Icon="TomaIcon" />
+        <RegistryValue Root="HKCU" Key="Software\NJB-PROJECT\TomaTomaWindows" Name="DesktopShortcut" Value="1" Type="integer" KeyPath="yes" />
+      </Component>
+    </StandardDirectory>
+    <Feature Id="MainFeature" Title="TOMA TOMA" Level="1">
+      <ComponentRef Id="MainFiles" /><ComponentRef Id="MenuShortcuts" /><ComponentRef Id="DesktopShortcut" />
+    </Feature>
+    <ui:WixUI Id="WixUI_Minimal" />
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.ProjectRoot)\installer\license.rtf" />
+    <WixVariable Id="WixUIBannerBmp" Value="$(var.ProjectRoot)\installer\banner.bmp" />
+    <WixVariable Id="WixUIDialogBmp" Value="$(var.ProjectRoot)\installer\dialog.bmp" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Buka TOMA TOMA" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
+    <CustomAction Id="LaunchApplication" FileRef="TomaExe" ExeCommand="" Execute="immediate" Impersonate="yes" Return="asyncNoWait" />
+    <UI><Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="LaunchApplication" Condition="WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 AND NOT Installed" /></UI>
+  </Package>
+</Wix>

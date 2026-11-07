@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.6.1 — 2026-11-08
+- Per-user Windows MSI installer with desktop/Start Menu shortcuts, uninstall and major-upgrade identity.
+- Mandatory updates when a valid newer stable release is detected, on startup and periodic checks.
+- GitHub-only downloads with bounded redirects, exact size and SHA-256 verification; cached version requirement works offline.
+- Preserve settings/lyric cache across installs; direct MSI download link for users.
+- Existing 1.5.x installations need a one-time manual MSI migration.
+
 ## 1.5.0 — 2026-11-07
 - Independent compact/expanded island themes with live preview, Save/Cancel and four presets.
 - Solid, gradient, or local-image backgrounds; text/accent/border colors and background opacity.

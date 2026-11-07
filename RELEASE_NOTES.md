@@ -1,16 +1,14 @@
-# v1.5.0 — Make the island yours
+# v1.6.1 — Install once, stay up to date
 
-A Windows-only open-source release of TOMA TOMA, with independent themes for the compact capsule and expanded card.
+Download **TOMA-TOMA-Windows-Setup-x64.msi**, run the Windows installation wizard, then use the desktop/Start Menu shortcut. Do not download Source code.zip to install the app.
 
-- Live theme preview with separate compact/expanded settings, Save and Cancel.
-- Midnight, Aurora, Sunset and Ocean presets; custom solid/gradient/local-image backgrounds, text/accent/border colors and background opacity.
-- Existing live lyrics, version selection, LRC import, media controls and stereo Bass/Sub-Bass spectrum.
-- MIT license, build instructions, privacy/contributor docs and three feature GIFs plus a short showcase video.
+- New per-user MSI installer, shortcuts and Windows uninstall entry.
+- Startup and periodic update checks. When a verified newer stable release is detected, update or exit before using the old application.
+- Official GitHub-only installer download with SHA-256 and size verification; no silent installation.
+- Themes, lyric cache and timing preferences stay separate from program files.
+- Existing 1.5.x users must install this MSI once; those older binaries have no updater yet.
 
-## Download
-Extract `TOMA-TOMA-Windows-1.5.0-x64.zip` and launch `TOMA TOMA.exe`. Runtime included; Windows x64, build 19041+ target. This is an unsigned portable build. Android source and APKs are not included.
+Network failure permits offline use only if the app has not already learned of a newer required release. The installer is unsigned. This release contains Windows code and installer only; Android is unchanged.
 
-## Verification
-Release build/publish: 0 warnings/errors. Final executable self-test: 59 checks passed. The SHA256SUMS file records the ZIP and executable hashes. Playback/provider support and actual FPS/latency vary by system.
-
-Feature media uses the actual WPF components with original demo text and generated PCM. It is not a performance benchmark or a recording of commercial music.
+## Validation
+75 executable self-tests pass. MSI schema/database and payload integrity were checked. Interactive install/uninstall and a real upgrade could not be confirmed in the automated environment (Windows Installer 1619/1622); please report installation issues with your Windows version.

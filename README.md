@@ -10,7 +10,7 @@ A small Windows companion that keeps lyrics, stereo spectrum, and playback contr
 ![MIT License](https://img.shields.io/badge/license-MIT-80dfcb?style=flat-square)
 ![WPF](https://img.shields.io/badge/.NET_8-WPF-8c73dd?style=flat-square)
 
-[**Download Windows x64**](https://github.com/NJB-PROJECT/TOMA-TOMA-Windows/releases/latest) · [Feature clips](#lihat-fiturnya) · [Build from source](#build-dari-source) · [Privacy](PRIVACY.md)
+[**Install TOMA TOMA · Windows x64 (.msi)**](https://github.com/NJB-PROJECT/TOMA-TOMA-Windows/releases/latest/download/TOMA-TOMA-Windows-Setup-x64.msi) · [Feature clips](#lihat-fiturnya) · [Build from source](#build-dari-source) · [Privacy](PRIVACY.md)
 
 ![TOMA TOMA island with a custom theme](docs/media/hero.png)
 
@@ -58,15 +58,26 @@ L cyan–mint, R ungu–pink. Kapsul mempunyai 12 band per kanal; kartu besar 22
 
 ## Mulai dalam satu menit
 
-1. Unduh ZIP **Windows x64** dari [Releases](https://github.com/NJB-PROJECT/TOMA-TOMA-Windows/releases/latest), lalu ekstrak seluruh isinya.
-2. Buka `TOMA TOMA.exe`. Paket portable sudah menyertakan runtime .NET; tidak perlu installer.
+1. Unduh [**TOMA-TOMA-Windows-Setup-x64.msi**](https://github.com/NJB-PROJECT/TOMA-TOMA-Windows/releases/latest/download/TOMA-TOMA-Windows-Setup-x64.msi).
+2. Buka installer, ikuti wizard, lalu buka **TOMA TOMA Windows** dari desktop/Start Menu. Runtime .NET sudah termasuk. **Jangan pilih “Source code.zip”** untuk memasang aplikasi; itu arsip kode untuk developer.
 3. Putar musik di aplikasi/browser yang menyediakan sesi media Windows. Tekan **Ikuti pemutar Windows** jika diperlukan.
 4. Pilih versi lirik bila diminta. Klik kapsul untuk memperbesar; swipe kartu ke atas untuk mengecilkan.
 5. Tekan **Personalisasi island** di sidebar untuk mengatur kedua ukuran kartu.
 
 Menutup jendela utama menyembunyikannya ke system tray. Pilih **Keluar** dari tray untuk menghentikan aplikasi. Tidak ada autostart yang dipasang otomatis.
 
-Target build: **Windows x64, Windows 10 build 19041 atau lebih baru / Windows 11**. Perilaku sesi media/seek bergantung pada pemutar. File EXE rilis saat ini belum ditandatangani dengan sertifikat code signing.
+Target build: **Windows x64, Windows 10 build 19041 atau lebih baru / Windows 11**. Perilaku sesi media/seek bergantung pada pemutar. Paket installer saat ini belum ditandatangani dengan sertifikat code signing. Instalasi memakai folder program pengguna dan menyediakan menu uninstall Windows; tidak memasang autostart.
+
+## Update wajib sejak versi 1.6.1
+
+Aplikasi memeriksa release stabil resmi saat dibuka, setiap 15 menit ketika berjalan, dan dari tray **Periksa pembaruan**. Jika ada versi lebih baru dengan installer yang valid, pengguna harus memilih **Update sekarang** atau keluar; aplikasi lama tidak dilanjutkan. Installer diunduh dari repository resmi, ukuran dan SHA-256 diverifikasi, lalu wizard MSI dibuka. Jika unduhan gagal atau wizard dibatalkan, aplikasi lama tetap meminta update ketika dibuka lagi.
+
+- **Pengguna 1.5.0 atau lebih lama:** pasang MSI terbaru sekali secara manual. Aplikasi lama yang belum mempunyai updater tidak bisa dipaksa memperbarui dirinya dari jarak jauh.
+- **Tanpa koneksi/GitHub bermasalah:** jika belum pernah mengetahui versi yang lebih baru, aplikasi tetap dapat dibuka setelah pemeriksaan gagal. Jika versi wajib yang lebih baru sudah tersimpan, update tetap diminta ketika offline.
+- Tema, cache lirik dan koreksi waktu disimpan terpisah dari folder instalasi. Uninstall mempertahankan data tersebut.
+- Ini kebijakan pada aplikasi resmi, bukan mekanisme DRM. Source MIT tetap boleh dimodifikasi/fork.
+
+Arsip “Source code.zip” dan “Source code.tar.gz” di halaman release dibuat otomatis oleh GitHub untuk developer. File instalasi pengguna adalah **MSI** di atas.
 
 ## Catatan yang berguna
 
@@ -106,6 +117,19 @@ Ekspor komponen WPF untuk membuat materi demo tanpa merekam desktop:
 
 Mode showcase memakai data contoh sendiri, tidak memulai capture audio atau pencarian lirik, dan tidak menyimpan perubahan ke pengaturan pengguna. Ia menghasilkan frame PNG; tool penggabung video diperlukan untuk membuat MP4/GIF.
 
+### Membuat installer MSI
+
+Pasang tool build [WiX 4](https://docs.firegiant.com/wix/), lalu tambahkan extension UI lokal:
+
+```powershell
+dotnet tool install wix --tool-path .tools/wix --version 4.0.6
+.tools/wix/wix.exe extension add WixToolset.UI.wixext/4.0.6
+./build.ps1 -Publish
+./build-installer.ps1
+```
+
+Output default ada di `installer-out/TOMA-TOMA-Windows-Setup-x64.msi`. Parameter `-PayloadDirectory` dan `-OutputDirectory` dapat memakai drive lain. Installer menyertakan aplikasi/runtime dan pemberitahuan lisensi, bukan folder source, SDK, atau data pribadi. Baca [UPDATING.md](UPDATING.md) sebelum menerbitkan versi baru.
+
 ## Struktur proyek
 
 ```text
@@ -118,6 +142,9 @@ src/
   AudioSpectrum.cs      # WASAPI, FFT, stereo dan rendering
   SelfTest.cs           # pengujian deterministik
   ShowcaseExporter.cs   # ekspor demo dari visual WPF
+  UpdateClient.cs       # metadata release, cache versi, unduhan SHA-256
+  UpdateWindow.cs       # gerbang update wajib
+installer/              # paket MSI WiX dan artwork wizard
 ```
 
 ## Kontribusi & lisensi

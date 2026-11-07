@@ -133,6 +133,7 @@ public static class SelfTest
         Test("Warna tidak valid jatuh ke warna aman", () => IslandBrushes.Color("invalid") == IslandBrushes.Color("#08090D"));
         Test("Background hilang memakai warna dasar", () => IslandBrushes.Background(new() { Mode = "Image", ImagePath = "missing-file.png" }) is System.Windows.Media.SolidColorBrush);
         Test("Tema transparansi dan preset tersimpan", () => { var s = new Settings { Appearance = new() { Expanded = IslandStyle.Preset("Aurora") } }; s.Appearance.Expanded.Opacity = .65; var restored = JsonSerializer.Deserialize<Settings>(JsonSerializer.Serialize(s)); return restored?.Appearance.Expanded.Mode == "Gradient" && restored.Appearance.Expanded.Opacity == .65; });
+        UpdateTests.Run(Test);
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(output))!);
         File.WriteAllText(output, JsonSerializer.Serialize(new
         {

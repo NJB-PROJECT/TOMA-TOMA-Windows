@@ -17,7 +17,7 @@ public sealed class PlayerState : IDisposable
         get;
     }
     private double showcasePosition; public MediaService Media { get; } = new(); public AudioSpectrum Audio { get; } = new();
-    private readonly LyricsClient client = new(); private CancellationTokenSource? lookup; private readonly MediaPlayer local = new(); private bool localMode, localPlaying; private string lastExternal = ""; private int offset;
+    private readonly LyricsClient client = new(); private CancellationTokenSource? lookup; private readonly MediaPlayer local = new(); private bool localMode, localPlaying, preparingUpdate; private string lastExternal = ""; private int offset;
     public Track? Track
     {
         get; private set;
@@ -46,7 +46,7 @@ public sealed class PlayerState : IDisposable
     }
     private void OnMedia()
     {
-        if (localMode)
+        if (localMode || preparingUpdate)
             return;
         if (Media.Current == null)
         {
@@ -252,6 +252,15 @@ public sealed class PlayerState : IDisposable
         }
         Audio.ShowcaseFrame(seconds);
         Changed?.Invoke();
+    }
+    public void PrepareForUpdate()
+    {
+        preparingUpdate = true;
+        lookup?.Cancel();
+        Media.Dispose();
+        Audio.Stop();
+        local.Stop();
+        localPlaying = false;
     }
     public void Dispose()
     {

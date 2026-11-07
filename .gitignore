@@ -18,3 +18,11 @@ app.log
 .env.*
 showcase-frames/
 self-test.json
+
+.wix/
+installer-out/
+installer-payload/
+*.wixpdb
+*.msi
+SHA256SUMS.txt
+update-state.json
