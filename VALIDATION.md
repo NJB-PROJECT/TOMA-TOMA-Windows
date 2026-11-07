@@ -1,12 +1,11 @@
-# Validation — Windows 1.6.1
+# Validation — Windows 1.6.2
 
-- Self-contained Release publish: 0 warnings/errors.
-- Final executable self-test: **75 checks, 0 failures**. Existing lyric/parser, stereo FFT and theme tests are retained. New updater tests cover numeric versions, stable-release filtering, canonical repository URLs, offline policy/cache, readonly cache, exact size/SHA-256 verification, cache reuse, hostile redirects and tampered/oversize downloads.
-- MSI compiled with WiX 4.0.6/UI extension. Database opens successfully and reports the expected version, seven application/license files, per-user registry components, shortcut targets and upgrade metadata. The application extracted from the MSI matched the published payload hash in the packaging inspection.
-- Automated MSI installation attempts in this environment returned Windows Installer 1622/1619. Interactive install/uninstall and a real major upgrade have **not** been confirmed by this automated test. A direct user install test was requested. No system security policies or permissions were changed to bypass these failures.
-- No Android code or APK is part of this Windows source/release.
-- Media/provider/device coverage and real-time FPS/latency remain limited. The existing showcase uses original text/generated PCM, not a performance benchmark.
+- Final self-contained Release publish: 0 warnings/errors. Executable self-test: **75 checks, 0 failures**.
+- Tests cover lyrics/LRC, real FFT/stereo, themes and update version comparison, official source validation, stable release filtering, offline cache policy, readonly cache, SHA-256/size verification, tampering and hostile redirects.
+- MSI compiled/validated with WiX 4.0.6. A physical Windows Installer lifecycle test installed 1.6.1 into a non-default test folder, upgraded to 1.6.2, and uninstalled using only the product code. All exit codes were 0; installed EXE version was 1.6.2.0; uninstall removed the application files; the existing settings file hash was unchanged. Shortcuts were disabled for the isolated lifecycle test to avoid changing the tester's desktop; shortcut definitions were inspected in the MSI database.
+- Initial automated errors 1619/1622 were caused by the test environment's virtual AppData path. Using the actual physical package file path resolved them. A custom-folder uninstall issue discovered during testing was fixed by persisting the installation directory in HKCU. No OS security policies or permissions were changed.
+- Live GitHub integration on the preceding 1.6.1 installer: simulated 1.5.0 client detected the required update, downloaded the released MSI and verified its size/hash; current 1.6.1 client was allowed. The actual required-update window was inspected and exited without launching an installer. The updater implementation is retained in 1.6.2.
+- Android is not part of this repository/release. Player/device coverage and actual FPS/latency remain limited. Showcase media uses original text/generated PCM, not benchmarks or private playback data.
 
-## Earlier 1.5.0 validation
-
-59 self-tests passed; native theme preview and Cancel behavior were checked in the running Windows application. Feature media exports actual WPF components without private desktop/playback data.
+## Earlier 1.5.0
+59 self-tests passed; native theme preview/Cancel were checked. Feature clips export actual WPF components without recording the desktop.

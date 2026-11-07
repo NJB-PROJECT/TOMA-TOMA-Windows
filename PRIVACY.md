@@ -1,7 +1,7 @@
 # Data & privacy
 
 - No account, API key, telemetry, analytics, or automatic cloud backup is built into TOMA TOMA.
-- Since 1.6.0, the updater contacts the public GitHub Releases API for this repository on startup and periodically. It sends the app updater User-Agent, not playback metadata or a user identifier. GitHub receives normal network request information. Installer downloads use GitHub release/CDN hosts.
+- Since 1.6.1, the updater contacts the public GitHub Releases API for this repository on startup and periodically. It sends the app updater User-Agent, not playback metadata or a user identifier. GitHub receives normal network request information. Installer downloads use GitHub release/CDN hosts.
 - `update-state.json` caches the last validated stable release under the local data folder; downloaded MSI files stay under its `updates/<version>/` subfolder. Installers are only launched after an explicit Update button click and hash/size verification. No silent update install or system-wide enforcement is performed.
 - Track title, artist and duration are sent to `https://lrclib.net` for lyric lookup. The fallback provider `https://api.lyrics.ovh` receives artist/title. Their independent privacy policies and availability apply.
 - Audio spectrum uses the Windows default output loopback. Audio samples stay in memory; the app does not write or upload audio recordings. It does not capture the microphone.

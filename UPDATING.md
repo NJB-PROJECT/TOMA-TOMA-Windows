@@ -1,6 +1,6 @@
 # Release and updater contract
 
-1. Increment `<Version>` in the Windows csproj using three numeric components (for example 1.6.1). Keep the WiX `UpgradeCode` and component GUIDs stable for upgrades.
+1. Increment `<Version>` in the Windows csproj using three numeric components (for example 1.6.3 after 1.6.2). Keep the WiX `UpgradeCode` and component GUIDs stable for upgrades.
 2. Build/publish and run the EXE self-tests. Build MSI with `./build-installer.ps1`. Test install, upgrade and uninstall on Windows before recommending broad distribution.
 3. Publish a Git tag `v<Version>` from the matching source commit.
 4. Create a **draft** GitHub release and upload **TOMA-TOMA-Windows-Setup-x64.msi**. Keep that asset name stable; the repository is fixed in UpdateClient.cs.

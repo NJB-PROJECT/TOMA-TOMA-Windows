@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.2 — 2026-11-08
+- Remember the MSI installation directory in HKCU so upgrades and uninstall correctly locate custom-folder installations.
+- Verified old-version install, upgrade, cleanup and preservation of existing settings.
+
 ## 1.6.1 — 2026-11-08
 - Per-user Windows MSI installer with desktop/Start Menu shortcuts, uninstall and major-upgrade identity.
 - Mandatory updates when a valid newer stable release is detected, on startup and periodic checks.

@@ -6,6 +6,9 @@
     <Property Id="ARPURLINFOABOUT" Value="https://github.com/NJB-PROJECT/TOMA-TOMA-Windows" />
     <Property Id="ARPURLUPDATEINFO" Value="https://github.com/NJB-PROJECT/TOMA-TOMA-Windows/releases/latest" />
     <Property Id="CREATESHORTCUTS" Value="1" Secure="yes" />
+    <Property Id="INSTALLFOLDER" Secure="yes">
+      <RegistrySearch Id="RememberInstallFolder" Root="HKCU" Key="Software\NJB-PROJECT\TomaTomaWindows" Name="InstallFolder" Type="raw" Bitness="always64" />
+    </Property>
     <Icon Id="TomaIcon" SourceFile="$(var.ProjectRoot)\src\Assets\Toma.ico" />
     <StandardDirectory Id="LocalAppDataFolder">
       <Directory Id="UserProgramsRoot" Name="Programs">
@@ -19,6 +22,7 @@
             <File Source="$(var.ProjectRoot)\THIRD_PARTY_NOTICES.md" />
             <File Source="$(var.ProjectRoot)\PRIVACY.md" />
             <RegistryValue Root="HKCU" Key="Software\NJB-PROJECT\TomaTomaWindows" Name="InstalledVersion" Value="$(var.AppVersion)" Type="string" KeyPath="yes" />
+            <RegistryValue Root="HKCU" Key="Software\NJB-PROJECT\TomaTomaWindows" Name="InstallFolder" Value="[INSTALLFOLDER]" Type="string" />
             <RemoveFolder Id="RemoveInstallFolder" On="uninstall" />
           </Component>
         </Directory>
