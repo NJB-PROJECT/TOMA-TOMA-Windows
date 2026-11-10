@@ -1,3 +1,14 @@
+# Validation — Lyrivane Desktop 2.0.0
+
+- Self-contained Release publish completed, with no compiler warnings/errors. Executable self-test: **75 checks, 0 failures**.
+- Actual WPF demo window inspected through Windows Computer Use: active-line highlight, long lyric wrapping, expanded metadata search, source controls and reachable island settings. Demo uses original sample text and generated PCM; it is not a benchmark.
+- Generated PNG/ICO embedded in WPF resources and executable. Installer banner/dialog refreshed. Native dark title bar inspected.
+- Real Windows Installer upgrade from installed 1.6.2 to 2.0.0 completed with exit code **0**. Existing settings hash unchanged, new Lyrivane.exe present, previous TOMA TOMA.exe removed. UpgradeCode and storage/updater identifiers preserved. This run did not uninstall the user's application.
+- UI feature clips and desktop image regenerated from actual WPF visuals in isolated showcase mode, with original sample text/generated PCM.
+- No Android files are included or changed. No new latency/FPS measurement is claimed.
+
+---
+
 # Validation — Windows 1.6.2
 
 - Final self-contained Release publish: 0 warnings/errors. Executable self-test: **75 checks, 0 failures**.

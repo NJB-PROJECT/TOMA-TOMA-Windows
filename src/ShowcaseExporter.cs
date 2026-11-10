@@ -11,16 +11,9 @@ internal static class ShowcaseExporter
     public static ImageSource Cover { get; } = CreateCover();
     private static ImageSource CreateCover()
     {
-        var drawing = new DrawingGroup();
-        using (var dc = drawing.Open())
-        {
-            dc.DrawRectangle(new LinearGradientBrush(Colors.Teal, Colors.Indigo, 45), null, new Rect(0, 0, 120, 120));
-            dc.DrawEllipse(new SolidColorBrush(Color.FromArgb(110, 128, 255, 220)), null, new Point(60, 60), 43, 43);
-            dc.DrawText(new FormattedText("toma", System.Globalization.CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface("Segoe UI Semibold"), 29, Brushes.White, 1), new Point(22, 38));
-        }
-        drawing.Freeze();
-        return new DrawingImage(drawing);
+        return new BitmapImage(new Uri("pack://application:,,,/Assets/Lyrivane.png"));
     }
+
     public static async Task Export(string directory)
     {
         Directory.CreateDirectory(directory);
@@ -29,6 +22,13 @@ internal static class ShowcaseExporter
         var window = new IslandWindow(state, () => { }) { Left = -32000, Top = -32000 };
         window.Show();
         window.UpdateLayout();
+        var main = new MainWindow(state, window) { Left = -32000, Top = -32000, Width = 1080, Height = 760 };
+        main.Show(); main.UpdateLayout();
+        var mainBitmap = new RenderTargetBitmap((int)main.ActualWidth, (int)main.ActualHeight, 96, 96, PixelFormats.Pbgra32);
+        mainBitmap.Render(main);
+        var mainEncoder = new PngBitmapEncoder(); mainEncoder.Frames.Add(BitmapFrame.Create(mainBitmap));
+        using (var mainFile = File.Create(Path.Combine(directory, "desktop.png"))) mainEncoder.Save(mainFile);
+        main.Exiting = true; main.Close();
         for (int frame = 0; frame < 320; frame++)
         {
             double time = frame / 20.0;
@@ -61,7 +61,7 @@ internal static class ShowcaseExporter
             using (var dc = visual.RenderOpen())
             {
                 dc.DrawRectangle(new SolidColorBrush(Color.FromRgb(16, 18, 29)), null, new Rect(0, 0, 680, 620));
-                dc.DrawText(Text("toma toma", 28, Brushes.White), new Point(28, 20));
+                dc.DrawText(Text("Lyrivane", 28, Brushes.White), new Point(28, 20));
                 dc.DrawText(Text("WINDOWS   /   YOUR MUSIC, YOUR ISLAND", 10, Brushes.LightSlateGray), new Point(29, 58));
                 dc.PushTransform(new TranslateTransform((680 - window.ActualWidth) / 2, 94));
                 dc.DrawRectangle(new VisualBrush(window), null, new Rect(0, 0, window.ActualWidth, window.ActualHeight));

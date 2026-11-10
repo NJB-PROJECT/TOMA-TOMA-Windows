@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.0 — 2026-11-11
+- Rebrand to Lyrivane Desktop with generated mint/cyan ribbon logo and installer artwork.
+- Rebuilt listening workspace: focused lyric panel, separate transport card, progressive search/settings and dark scrollbars.
+- Stable lyric row typography, dark native title bar, Space/Ctrl+O/Ctrl+L shortcuts.
+- Preserve MSI identity, settings and updater compatibility for 1.6.x migration.
+
+
 ## 1.6.2 — 2026-11-08
 - Remember the MSI installation directory in HKCU so upgrades and uninstall correctly locate custom-folder installations.
 - Verified old-version install, upgrade, cleanup and preservation of existing settings.

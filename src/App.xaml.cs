@@ -14,7 +14,7 @@ public partial class App : System.Windows.Application
     {
         base.OnStartup(e);
         ShutdownMode = ShutdownMode.OnExplicitShutdown;
-        DispatcherUnhandledException += (_, error) => { FileLog.Write(error.Exception.ToString()); System.Windows.MessageBox.Show("Ada kendala. Detail disimpan di app.log pada folder data TOMA TOMA.", "TOMA TOMA"); error.Handled = true; };
+        DispatcherUnhandledException += (_, error) => { FileLog.Write(error.Exception.ToString()); System.Windows.MessageBox.Show("Ada kendala. Detail disimpan di app.log pada folder data Lyrivane.", "Lyrivane"); error.Handled = true; };
         if (e.Args.Contains("--update-probe"))
         {
             int at = Array.IndexOf(e.Args, "--update-probe");
@@ -31,8 +31,20 @@ public partial class App : System.Windows.Application
         if (e.Args.Contains("--update-preview"))
         {
             var preview = new UpdateClient(storage: Path.Combine(Path.GetTempPath(), "TomaTomaUpdatePreview"), current: new Version(1, 5, 0));
-            var gate = new UpdateWindow(preview) { Title = "TOMA TOMA · Preview update (simulasi versi 1.5.0)" };
+            var gate = new UpdateWindow(preview) { Title = "Lyrivane · Preview update (simulasi versi 1.5.0)" };
             gate.ShowDialog(); Shutdown(); return;
+        }
+        if (e.Args.Contains("--design-preview"))
+        {
+            state = new PlayerState(true); state.ShowcaseFrame(0);
+            island = new IslandWindow(state, () => main?.Show());
+            main = new MainWindow(state, island) { Title = "Lyrivane Desktop � Design preview (demo)" };
+            MainWindow = main; main.Show();
+            double time = 0;
+            var demoTimer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromMilliseconds(50) };
+            demoTimer.Tick += (_, _) => { time += .05; state.ShowcaseFrame(time % 18); };
+            main.Closed += (_, _) => { demoTimer.Stop(); state.Dispose(); Shutdown(); };
+            demoTimer.Start(); return;
         }
         if (e.Args.Contains("--showcase"))
         {
@@ -103,7 +115,7 @@ public partial class App : System.Windows.Application
         single = new Mutex(true, "Local\\TomaTomaWindows.Desktop.1", out bool first);
         if (!first)
         {
-            System.Windows.MessageBox.Show("TOMA TOMA sudah berjalan. Buka lewat ikon di system tray.", "TOMA TOMA");
+            System.Windows.MessageBox.Show("Lyrivane sudah berjalan. Buka lewat ikon di system tray.", "Lyrivane");
             Shutdown();
             return;
         }
@@ -114,13 +126,13 @@ public partial class App : System.Windows.Application
         main = new MainWindow(state, island);
         MainWindow = main;
         var menu = new System.Windows.Forms.ContextMenuStrip();
-        menu.Items.Add("Buka TOMA TOMA", null, (_, _) => Dispatcher.Invoke(OpenMain));
+        menu.Items.Add("Buka Lyrivane", null, (_, _) => Dispatcher.Invoke(OpenMain));
         menu.Items.Add("Tampilkan island", null, (_, _) => Dispatcher.Invoke(() => { state.Settings.Island = true; Storage.Save(state.Settings); island.Show(); island.Reposition(); }));
         menu.Items.Add("Sembunyikan island", null, (_, _) => Dispatcher.Invoke(() => { state.Settings.Island = false; Storage.Save(state.Settings); island.Hide(); }));
         menu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
         menu.Items.Add("Periksa pembaruan", null, async (_, _) => await CheckUpdates(true));
         menu.Items.Add("Keluar", null, (_, _) => Dispatcher.Invoke(ExitApp));
-        tray = new System.Windows.Forms.NotifyIcon { Icon = System.Drawing.Icon.ExtractAssociatedIcon(Environment.ProcessPath!) ?? System.Drawing.SystemIcons.Application, Text = "TOMA TOMA · Auto Lyrics", ContextMenuStrip = menu, Visible = true };
+        tray = new System.Windows.Forms.NotifyIcon { Icon = System.Drawing.Icon.ExtractAssociatedIcon(Environment.ProcessPath!) ?? System.Drawing.SystemIcons.Application, Text = "Lyrivane · Auto Lyrics", ContextMenuStrip = menu, Visible = true };
         tray.DoubleClick += (_, _) => Dispatcher.Invoke(OpenMain);
         main.Show();
         if (state.Settings.Island)

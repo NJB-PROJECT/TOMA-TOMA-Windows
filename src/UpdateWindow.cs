@@ -23,10 +23,10 @@ public sealed class UpdateWindow : Window
     public UpdateWindow(UpdateClient client, UpdateRelease? available = null)
     {
         this.client = client; release = available;
-        Title = "TOMA TOMA · Pembaruan"; Width = 510; SizeToContent = SizeToContent.Height; ResizeMode = ResizeMode.NoResize; WindowStartupLocation = WindowStartupLocation.CenterScreen;
+        Title = "Lyrivane · Pembaruan"; Width = 510; SizeToContent = SizeToContent.Height; ResizeMode = ResizeMode.NoResize; WindowStartupLocation = WindowStartupLocation.CenterScreen;
         Background = IslandBrushes.Solid("#11121A"); Foreground = Brushes.White; FontFamily = new FontFamily("Segoe UI");
         var root = new StackPanel { Margin = new Thickness(28) }; Content = root;
-        root.Children.Add(new TextBlock { Text = "TOMA TOMA  /  WINDOWS", Foreground = IslandBrushes.Solid("#B2A1E0"), FontSize = 10, Margin = new Thickness(0, 0, 0, 18) });
+        root.Children.Add(new TextBlock { Text = "Lyrivane  /  WINDOWS", Foreground = IslandBrushes.Solid("#B2A1E0"), FontSize = 10, Margin = new Thickness(0, 0, 0, 18) });
         root.Children.Add(title); root.Children.Add(details); root.Children.Add(progress);
         var buttons = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right }; root.Children.Add(buttons);
         var exit = new Button { Content = "Keluar", Padding = new Thickness(12, 10, 12, 10) }; exit.Click += (_, _) => Close();
@@ -55,7 +55,7 @@ public sealed class UpdateWindow : Window
     private void Offer()
     {
         title.Text = "Versi baru wajib dipasang.";
-        details.Text = "Versi " + release!.Version + " tersedia. Perbarui TOMA TOMA sebelum melanjutkan. Tema dan lirik tersimpan tetap dipertahankan.\n\nInstaller MSI akan dibuka setelah unduhan dan SHA-256 terverifikasi.";
+        details.Text = "Versi " + release!.Version + " tersedia. Perbarui Lyrivane sebelum melanjutkan. Tema dan lirik tersimpan tetap dipertahankan.\n\nInstaller MSI akan dibuka setelah unduhan dan SHA-256 terverifikasi.";
         progress.Visibility = Visibility.Collapsed; install.Content = "Update ke " + release.Version; install.IsEnabled = true; retry.Visibility = Visibility.Visible;
     }
 

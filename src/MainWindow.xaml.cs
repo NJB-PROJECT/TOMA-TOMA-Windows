@@ -11,11 +11,20 @@ namespace Toma.Windows;
 public partial class MainWindow : Window
 {
     private readonly PlayerState state; private readonly IslandWindow island; private readonly DispatcherTimer timer = new() { Interval = TimeSpan.FromMilliseconds(100) }; private bool ready, selecting; private string? shownKey; private System.Collections.Generic.List<LyricLine>? shownLines; private int lastIndex = -2;
+    [System.Runtime.InteropServices.DllImport("dwmapi.dll")] private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attribute, ref int value, int size);
     public bool Exiting;
     public MainWindow(PlayerState state, IslandWindow island)
     {
         InitializeComponent();
         this.state = state;
+        SourceInitialized += (_, _) => { int dark = 1; DwmSetWindowAttribute(new System.Windows.Interop.WindowInteropHelper(this).Handle, 20, ref dark, sizeof(int)); };
+        PreviewKeyDown += async (_, key) =>
+        {
+            if (key.OriginalSource is TextBox) return;
+            if (key.Key == System.Windows.Input.Key.Space) { key.Handled = true; await state.Toggle(); }
+            else if (System.Windows.Input.Keyboard.Modifiers == System.Windows.Input.ModifierKeys.Control && key.Key == System.Windows.Input.Key.O) { key.Handled = true; LocalClick(this, new RoutedEventArgs()); }
+            else if (System.Windows.Input.Keyboard.Modifiers == System.Windows.Input.ModifierKeys.Control && key.Key == System.Windows.Input.Key.L) { key.Handled = true; LinkClick(this, new RoutedEventArgs()); }
+        };
         this.island = island;
         Height = Math.Max(MinHeight, Math.Min(780, SystemParameters.WorkArea.Height - 36));
         Width = Math.Max(MinWidth, Math.Min(1080, SystemParameters.WorkArea.Width - 48));
@@ -119,7 +128,7 @@ public partial class MainWindow : Window
     }
     private void LinkClick(object sender, RoutedEventArgs e)
     {
-        string? value = Ui.Ask(this, "Buka link lagu", "Tempel link Spotify atau YouTube Music. Putar lagunya di browser/pemutar; TOMA akan mengikuti sesi media Windows.");
+        string? value = Ui.Ask(this, "Buka link lagu", "Tempel link Spotify atau YouTube Music. Putar lagunya di browser/pemutar; Lyrivane akan mengikuti sesi media Windows.");
         if (value == null)
             return;
         if (!Uri.TryCreate(value.Trim(), UriKind.Absolute, out var uri) || uri.Scheme != "https" || !(new[] { "music.youtube.com", "www.youtube.com", "youtube.com", "youtu.be", "open.spotify.com", "spotify.link" }).Contains(uri.Host.ToLowerInvariant()))

@@ -1,6 +1,6 @@
 <div align="center">
 
-# toma toma
+# Lyrivane Desktop
 ### Your music. Your lyrics. Your island.
 
 A small Windows companion that keeps lyrics, stereo spectrum, and playback controls close to your music.
@@ -10,15 +10,23 @@ A small Windows companion that keeps lyrics, stereo spectrum, and playback contr
 ![MIT License](https://img.shields.io/badge/license-MIT-80dfcb?style=flat-square)
 ![WPF](https://img.shields.io/badge/.NET_8-WPF-8c73dd?style=flat-square)
 
-[**Install TOMA TOMA · Windows x64 (.msi)**](https://github.com/NJB-PROJECT/TOMA-TOMA-Windows/releases/latest/download/TOMA-TOMA-Windows-Setup-x64.msi) · [Feature clips](#lihat-fiturnya) · [Build from source](#build-dari-source) · [Privacy](PRIVACY.md)
+[**Install Lyrivane · Windows x64 (.msi)**](https://github.com/NJB-PROJECT/TOMA-TOMA-Windows/releases/latest/download/Lyrivane-Setup-x64.msi) · [Feature clips](#lihat-fiturnya) · [Build from source](#build-dari-source) · [Privacy](PRIVACY.md)
 
-![TOMA TOMA island with a custom theme](docs/media/hero.png)
+![Lyrivane Desktop](docs/media/desktop.png)
+
+![Lyrivane island with a custom theme](docs/media/hero.png)
 
 </div>
 
+## Identitas baru
+
+**TOMA TOMA kini menjadi Lyrivane Desktop.** Versi 2.0 membawa ruang lirik yang luas, panel pemutar baru, identitas mint-cyan, logo baru, scrollbar gelap, dan pengaturan bertahap. Space untuk putar/jeda; Ctrl+O membuka audio dan Ctrl+L membuka link ketika fokus berada di luar kolom teks.
+
+Nama keluarga Android yang disiapkan: **Lyrivane Mobile**. Repository/release ini tetap khusus Windows. Folder data, identitas MSI dan endpoint pembaruan lama dipertahankan agar pengguna 1.6.x bisa bermigrasi tanpa menghapus pengaturannya. MSI bernama lama tetap tersedia untuk updater lama. [Identitas dan logo](BRAND.md).
+
 ## Musikmu, tanpa harus terus membuka pemutar
 
-TOMA TOMA mengikuti sesi media Windows dari pemutar yang kompatibel, mencari lirik, lalu menampilkan baris aktif pada island di bagian atas monitor. Klik kapsul untuk membuka kartu; swipe ke atas untuk mengecilkannya. Klik di luar kartu membiarkannya tetap terbuka.
+Lyrivane mengikuti sesi media Windows dari pemutar yang kompatibel, mencari lirik, lalu menampilkan baris aktif pada island di bagian atas monitor. Klik kapsul untuk membuka kartu; swipe ke atas untuk mengecilkannya. Klik di luar kartu membiarkannya tetap terbuka.
 
 Proyek ini **khusus Windows**, gratis digunakan dan dimodifikasi di bawah lisensi MIT. Ini aplikasi pendamping independen; tidak berafiliasi dengan Spotify, YouTube, Xiaomi, atau Apple.
 
@@ -58,11 +66,11 @@ L cyan–mint, R ungu–pink. Kapsul mempunyai 12 band per kanal; kartu besar 22
 
 ## Mulai dalam satu menit
 
-1. Unduh [**TOMA-TOMA-Windows-Setup-x64.msi**](https://github.com/NJB-PROJECT/TOMA-TOMA-Windows/releases/latest/download/TOMA-TOMA-Windows-Setup-x64.msi).
-2. Buka installer, ikuti wizard, lalu buka **TOMA TOMA Windows** dari desktop/Start Menu. Runtime .NET sudah termasuk. **Jangan pilih “Source code.zip”** untuk memasang aplikasi; itu arsip kode untuk developer.
-3. Putar musik di aplikasi/browser yang menyediakan sesi media Windows. Tekan **Ikuti pemutar Windows** jika diperlukan.
+1. Unduh [**Lyrivane-Setup-x64.msi**](https://github.com/NJB-PROJECT/TOMA-TOMA-Windows/releases/latest/download/Lyrivane-Setup-x64.msi).
+2. Buka installer, ikuti wizard, lalu buka **Lyrivane Windows** dari desktop/Start Menu. Runtime .NET sudah termasuk. **Jangan pilih “Source code.zip”** untuk memasang aplikasi; itu arsip kode untuk developer.
+3. Putar musik di aplikasi/browser yang menyediakan sesi media Windows. Tekan **Hubungkan pemutar Windows** jika diperlukan.
 4. Pilih versi lirik bila diminta. Klik kapsul untuk memperbesar; swipe kartu ke atas untuk mengecilkan.
-5. Tekan **Personalisasi island** di sidebar untuk mengatur kedua ukuran kartu.
+5. Tekan **Island & pengaturan / Warna & background island** untuk mengatur kedua ukuran kartu.
 
 Menutup jendela utama menyembunyikannya ke system tray. Pilih **Keluar** dari tray untuk menghentikan aplikasi. Tidak ada autostart yang dipasang otomatis.
 
@@ -99,12 +107,12 @@ cd TOMA-TOMA-Windows
 ./build.ps1 -Publish
 ```
 
-`build.ps1` memakai SDK lokal di `.tools/dotnet` bila ada, atau `dotnet` dari PATH. Publish menghasilkan executable self-contained di `dist/`. Script publish mengganti proses TOMA TOMA yang berjalan dari folder `dist` proyek ini.
+`build.ps1` memakai SDK lokal di `.tools/dotnet` bila ada, atau `dotnet` dari PATH. Publish menghasilkan executable self-contained di `dist/`. Script publish mengganti proses Lyrivane yang berjalan dari folder `dist` proyek ini.
 
 Jalankan pengujian dari EXE hasil publish:
 
 ```powershell
-& './dist/TOMA TOMA.exe' --self-test "$PWD/self-test.json"
+& './dist/Lyrivane.exe' --self-test "$PWD/self-test.json"
 ```
 
 Laporan JSON menyertakan total dan hasil tiap pengujian. Pengujian mencakup parser LRC, pencocokan lirik, FFT/stereo, layout lirik panjang, serta tema. Lihat [VALIDATION.md](VALIDATION.md).
@@ -112,7 +120,7 @@ Laporan JSON menyertakan total dan hasil tiap pengujian. Pengujian mencakup pars
 Ekspor komponen WPF untuk membuat materi demo tanpa merekam desktop:
 
 ```powershell
-& './dist/TOMA TOMA.exe' --showcase "$PWD/showcase-frames"
+& './dist/Lyrivane.exe' --showcase "$PWD/showcase-frames"
 ```
 
 Mode showcase memakai data contoh sendiri, tidak memulai capture audio atau pencarian lirik, dan tidak menyimpan perubahan ke pengaturan pengguna. Ia menghasilkan frame PNG; tool penggabung video diperlukan untuk membuat MP4/GIF.
@@ -128,7 +136,7 @@ dotnet tool install wix --tool-path .tools/wix --version 4.0.6
 ./build-installer.ps1
 ```
 
-Output default ada di `installer-out/TOMA-TOMA-Windows-Setup-x64.msi`. Parameter `-PayloadDirectory` dan `-OutputDirectory` dapat memakai drive lain. Installer menyertakan aplikasi/runtime dan pemberitahuan lisensi, bukan folder source, SDK, atau data pribadi. Baca [UPDATING.md](UPDATING.md) sebelum menerbitkan versi baru.
+Output default ada di `installer-out/Lyrivane-Setup-x64.msi`. Parameter `-PayloadDirectory` dan `-OutputDirectory` dapat memakai drive lain. Installer menyertakan aplikasi/runtime dan pemberitahuan lisensi, bukan folder source, SDK, atau data pribadi. Baca [UPDATING.md](UPDATING.md) sebelum menerbitkan versi baru.
 
 ## Struktur proyek
 

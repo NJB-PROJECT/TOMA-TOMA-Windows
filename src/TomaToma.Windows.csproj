@@ -2,10 +2,11 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType><TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
     <UseWPF>true</UseWPF><UseWindowsForms>true</UseWindowsForms><Nullable>enable</Nullable><ImplicitUsings>disable</ImplicitUsings>
-    <AssemblyName>TOMA TOMA</AssemblyName><RootNamespace>Toma.Windows</RootNamespace><Version>1.6.2</Version>
+    <AssemblyName>Lyrivane</AssemblyName><RootNamespace>Toma.Windows</RootNamespace><Version>2.0.0</Version>
     <ApplicationManifest>app.manifest</ApplicationManifest><EnableWindowsTargeting>true</EnableWindowsTargeting>
-    <ApplicationIcon>Assets/Toma.ico</ApplicationIcon>
+    <ApplicationIcon>Assets/Lyrivane.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup><PackageReference Include="NAudio" Version="2.2.1"/></ItemGroup>
   <ItemGroup><Compile Remove="obj/**/*.cs;bin/**/*.cs" /></ItemGroup>
+  <ItemGroup><Resource Include="Assets/Lyrivane.png" /><Resource Include="Assets/Lyrivane.ico" /></ItemGroup>
 </Project>

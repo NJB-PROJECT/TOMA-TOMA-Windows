@@ -6,7 +6,7 @@ using System.Windows.Media.Imaging;
 namespace Toma.Windows;
 public sealed class IslandStyle
 {
-    public string Background { get; set; } = "#08090D"; public string Secondary { get; set; } = "#221A36"; public string Text { get; set; } = "#F3F2F8"; public string Muted { get; set; } = "#A49BAF"; public string Accent { get; set; } = "#DDD2FF"; public string Border { get; set; } = "#353440"; public string Mode { get; set; } = "Solid"; public string ImagePath { get; set; } = ""; public double Opacity { get; set; } = 1;
+    public string Background { get; set; } = "#0B131C"; public string Secondary { get; set; } = "#221A36"; public string Text { get; set; } = "#F3F2F8"; public string Muted { get; set; } = "#A49BAF"; public string Accent { get; set; } = "#A5FFE5"; public string Border { get; set; } = "#304453"; public string Mode { get; set; } = "Solid"; public string ImagePath { get; set; } = ""; public double Opacity { get; set; } = 1;
     public IslandStyle Copy() => (IslandStyle)MemberwiseClone();
     public static IslandStyle Preset(string name) => name switch
     {
@@ -22,7 +22,7 @@ public sealed class IslandAppearance
 }
 public static class IslandBrushes
 {
-    public static Color Color(string? value, string fallback = "#08090D")
+    public static Color Color(string? value, string fallback = "#0B131C")
     {
         try
         {

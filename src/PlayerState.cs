@@ -244,7 +244,7 @@ public sealed class PlayerState : IDisposable
         showcasePosition = seconds * 1000;
         if (Track == null)
         {
-            Track = new("A Little Light", "TOMA Studio · demo original", "", "Showcase", 18);
+            Track = new("A Little Light", "Lyrivane Studio · demo original", "", "Showcase", 18);
             Raw = "[00:00]Music, made a little more yours.\n[00:03]A little light across the room.\n[00:06]Long lyric lines wrap naturally, so every word has room to breathe.\n[00:10]Your colors. Your corner of the screen.\n[00:14]Keep the music close.";
             Lines = Lyrics.Parse(Raw);
             Provider = "DEMO · original sample text";

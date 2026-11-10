@@ -160,7 +160,7 @@ public partial class IslandWindow : Window
         MiniArt.Source = Art.Source = state.Cover;
         TrackTitle.Text = state.Track?.Title ?? "Putar musikmu";
         TrackArtist.Text = state.Track?.Artist is string artist && artist.Length > 0 ? artist : "Menunggu metadata artis";
-        MiniTitle.Text = state.Track?.Title ?? "TOMA TOMA · klik untuk membuka";
+        MiniTitle.Text = state.Track?.Title ?? "Lyrivane · klik untuk membuka";
         PlayButton.Content = state.Playing ? "Ⅱ" : "▶";
         LyricsPanel.Visibility = choosing ? Visibility.Collapsed : Visibility.Visible;
         ChoicesPanel.Visibility = choosing ? Visibility.Visible : Visibility.Collapsed;

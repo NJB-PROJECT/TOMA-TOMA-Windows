@@ -128,9 +128,9 @@ public static class SelfTest
         Test("Bass 120 Hz lebih dominan dari sub-bass", () => { var e = LowMeasure(120, .4); return e.BassLevel > .5 && e.BassLevel > e.SubBassLevel + .3; });
         Test("Treble tidak menggerakkan indikator bass", () => { var e = LowMeasure(9000, .4); return e.BassLevel < .01 && e.SubBassLevel < .01; });
         Test("Meter frekuensi rendah hening tanpa demo", () => { var e = LowMeasure(120, 0); return e.BassLevel == 0 && e.SubBassLevel == 0; });
-        Test("Tema kecil dan besar independen", () => { var a = new IslandAppearance(); a.Compact.Background = "#123456"; return a.Expanded.Background == "#08090D"; });
+        Test("Tema kecil dan besar independen", () => { var a = new IslandAppearance(); a.Compact.Background = "#123456"; return a.Expanded.Background == "#0B131C"; });
         Test("Salinan tema tidak mengubah tema asal", () => { var a = new IslandAppearance(); var b = a.Copy(); b.Compact.Accent = "#FFFFFF"; return a.Compact.Accent != "#FFFFFF"; });
-        Test("Warna tidak valid jatuh ke warna aman", () => IslandBrushes.Color("invalid") == IslandBrushes.Color("#08090D"));
+        Test("Warna tidak valid jatuh ke warna aman", () => IslandBrushes.Color("invalid") == IslandBrushes.Color("#0B131C"));
         Test("Background hilang memakai warna dasar", () => IslandBrushes.Background(new() { Mode = "Image", ImagePath = "missing-file.png" }) is System.Windows.Media.SolidColorBrush);
         Test("Tema transparansi dan preset tersimpan", () => { var s = new Settings { Appearance = new() { Expanded = IslandStyle.Preset("Aurora") } }; s.Appearance.Expanded.Opacity = .65; var restored = JsonSerializer.Deserialize<Settings>(JsonSerializer.Serialize(s)); return restored?.Appearance.Expanded.Mode == "Gradient" && restored.Appearance.Expanded.Opacity == .65; });
         UpdateTests.Run(Test);

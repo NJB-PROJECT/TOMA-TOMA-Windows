@@ -111,7 +111,7 @@ public sealed class AppearanceWindow : Window
         preview.BorderBrush = IslandBrushes.Solid(Theme.Border);
         preview.BorderThickness = new Thickness(1);
         var lines = new StackPanel();
-        lines.Children.Add(new TextBlock { Text = target.SelectedIndex == 1 ? "TOMA TOMA  /  LIVE LYRICS" : "♫  Kapsul kecil", Foreground = IslandBrushes.Solid(Theme.Muted), FontSize = 10 });
+        lines.Children.Add(new TextBlock { Text = target.SelectedIndex == 1 ? "Lyrivane  /  LIVE LYRICS" : "♫  Kapsul kecil", Foreground = IslandBrushes.Solid(Theme.Muted), FontSize = 10 });
         lines.Children.Add(new TextBlock { Text = "Musikmu. Warna pilihanmu.", TextWrapping = TextWrapping.Wrap, Foreground = IslandBrushes.Solid(Theme.Accent), FontSize = 21, FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 10, 0, 0) });
         lines.Children.Add(new TextBlock { Text = "Preview langsung · perubahan belum disimpan", Foreground = IslandBrushes.Solid(Theme.Text), FontSize = 11, Margin = new Thickness(0, 6, 0, 0) });
         preview.Child = lines;
