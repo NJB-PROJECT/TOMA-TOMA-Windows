@@ -1,3 +1,16 @@
+# Validation — Lyrivane Desktop 2.1.0
+
+- Release self-contained publish: zero warnings/errors. Executable **89 checks, 0 failures**.
+- Native offline conversion tested using packaged EXE: Japanese kanji/kana (including Japanese-only-kanji context), Arabic with and without vowel marks, Korean, Russian, Hindi and Chinese. Original Latin is not duplicated. Mixed Japanese/Arabic/Korean batches work. Input size and cancellation are bounded.
+- Original text/timestamps remain unchanged. Latin annotation runs on a background task with a bounded cache; stale/cancelled work cannot replace new song lyrics. Missing readings remain explicitly unavailable.
+- Actual Windows UI checked in isolated demo mode: original+Latin rows, checkbox off/on, expanded island original+Latin, wrapping. Sample text is original/non-song material. Preview settings are not saved to the user profile.
+- Arabic without harakat can lack vowels; text conversion does not restore missing vowels, translate lyrics, or analyze the recording. Japanese dictionary readings may differ from names/slang or a singer's intended pronunciation. No new timing is fabricated for untimed lyrics.
+- Uses Apache Lucene.NET Kuromoji dictionary/resources embedded in the EXE and the OS ICU C API. Full dependency/dictionary notices ship with the installer. No NMeCab runtime is included.
+- Real per-user MSI upgrade from 2.0.0 to 2.1.0: exit code 0, settings hash unchanged before launch, installed EXE version 2.1.0.0 and SHA-256 matching the published payload. Installed full dependency/dictionary notice hash matches the repository.
+- No Android changes are part of this release.
+
+---
+
 # Validation — Lyrivane Desktop 2.0.0
 
 - Self-contained Release publish completed, with no compiler warnings/errors. Executable self-test: **75 checks, 0 failures**.

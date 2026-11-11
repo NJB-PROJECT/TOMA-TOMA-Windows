@@ -16,6 +16,8 @@ public sealed class PlayerState : IDisposable
     {
         get;
     }
+    private CancellationTokenSource? latinJob;
+    public bool PreparingLatin { get; private set; }
     private double showcasePosition; public MediaService Media { get; } = new(); public AudioSpectrum Audio { get; } = new();
     private readonly LyricsClient client = new(); private CancellationTokenSource? lookup; private readonly MediaPlayer local = new(); private bool localMode, localPlaying, preparingUpdate; private string lastExternal = ""; private int offset;
     public Track? Track
@@ -36,6 +38,39 @@ public sealed class PlayerState : IDisposable
         local.MediaEnded += (_, _) => { localPlaying = false; Changed?.Invoke(); };
         local.MediaFailed += (_, _) => { Status = "Format audio belum dapat dibuka Windows. Pilih file lain."; localPlaying = false; Changed?.Invoke(); };
     }
+    public void SetLatin(bool enabled)
+    {
+        Settings.ShowLatin = enabled;
+        if (!Showcase) Storage.Save(Settings);
+        PrepareLatin();
+        Changed?.Invoke();
+    }
+    private async void PrepareLatin()
+    {
+        latinJob?.Cancel();
+        PreparingLatin = false;
+        if (!Settings.ShowLatin)
+        {
+            Lines = Lines.Select(l => l with { Latin = "", LatinNote = "" }).ToList();
+            return;
+        }
+        var source = Lines;
+        var job = new CancellationTokenSource();
+        latinJob = job;
+        var cancel = job.Token;
+        PreparingLatin = source.Count > 0;
+        try
+        {
+            var annotated = await Task.Run(() => Romanizer.Annotate(source, cancel), cancel);
+            if (cancel.IsCancellationRequested || !ReferenceEquals(Lines, source) || preparingUpdate) return;
+            Lines = annotated;
+            PreparingLatin = false;
+            Changed?.Invoke();
+        }
+        catch (OperationCanceledException) { }
+        catch (Exception ex) { if (!cancel.IsCancellationRequested && ReferenceEquals(Lines, source)) { PreparingLatin = false; FileLog.Write("Latin annotation: " + ex.GetType().Name); Changed?.Invoke(); } }
+        finally { if (ReferenceEquals(latinJob, job)) latinJob = null; job.Dispose(); }
+    }
     public async Task Start()
     {
         if (Showcase)
@@ -53,6 +88,8 @@ public sealed class PlayerState : IDisposable
             if (Track != null)
             {
                 lookup?.Cancel();
+                latinJob?.Cancel();
+                PreparingLatin = false;
                 Track = null;
                 Raw = "";
                 Lines = new();
@@ -74,6 +111,8 @@ public sealed class PlayerState : IDisposable
     private void SetTrack(Track track)
     {
         lookup?.Cancel();
+        latinJob?.Cancel();
+        PreparingLatin = false;
         Track = track;
         Choices = new();
         Raw = "";
@@ -86,6 +125,7 @@ public sealed class PlayerState : IDisposable
             Raw = saved.Raw;
             Provider = saved.Source;
             Lines = Lyrics.Parse(Raw);
+            PrepareLatin();
         }
         Status = Raw.Length > 0 ? "Lirik tersimpan · mengikuti pemutar" : "Mencari lirik otomatis…";
         Changed?.Invoke();
@@ -139,6 +179,7 @@ public sealed class PlayerState : IDisposable
         Raw = record.Raw;
         Provider = record.Id > 0 ? "LRCLIB" : "lyrics.ovh";
         Lines = Lyrics.Parse(Raw);
+            PrepareLatin();
         Status = record.Instrumental ? "Versi ini ditandai instrumental." : Lines.Count > 0 && Lines[0].Time < 0 ? "Lirik tersedia tanpa timestamp; belum bisa mengikuti posisi otomatis." : "Lirik dipilih · auto-sync aktif";
         Save();
         Changed?.Invoke();
@@ -149,6 +190,7 @@ public sealed class PlayerState : IDisposable
         Raw = raw;
         Provider = "LRC lokal";
         Lines = Lyrics.Parse(raw);
+        PrepareLatin();
         Status = Lines.Count > 0 && Lines[0].Time >= 0 ? "LRC diimpor · mengikuti pemutar" : "Teks diimpor tanpa timestamp";
         Save();
         Changed?.Invoke();
@@ -180,7 +222,7 @@ public sealed class PlayerState : IDisposable
         };
         while (Settings.Songs.Count > 100)
             Settings.Songs.Remove(Settings.Songs.Keys.First());
-        Storage.Save(Settings);
+        if (!Showcase) Storage.Save(Settings);
     }
     public async Task Toggle()
     {
@@ -234,7 +276,7 @@ public sealed class PlayerState : IDisposable
             Audio.Start();
         else
             Audio.Stop();
-        Storage.Save(Settings);
+        if (!Showcase) Storage.Save(Settings);
         Changed?.Invoke();
     }
     internal void ShowcaseFrame(double seconds)
@@ -247,15 +289,28 @@ public sealed class PlayerState : IDisposable
             Track = new("A Little Light", "Lyrivane Studio · demo original", "", "Showcase", 18);
             Raw = "[00:00]Music, made a little more yours.\n[00:03]A little light across the room.\n[00:06]Long lyric lines wrap naturally, so every word has room to breathe.\n[00:10]Your colors. Your corner of the screen.\n[00:14]Keep the music close.";
             Lines = Lyrics.Parse(Raw);
+            PrepareLatin();
             Provider = "DEMO · original sample text";
             Status = "Showcase · generated PCM, no microphone";
         }
         Audio.ShowcaseFrame(seconds);
         Changed?.Invoke();
     }
+    internal void ShowcaseLatin()
+    {
+        if (!Showcase) return;
+        latinJob?.Cancel();
+        Track = new("Cara baca, dekat dengan musik", "Lyrivane Studio · contoh original", "", "Showcase", 18);
+        Raw = "[00:00]私は音楽が好きです\n[00:04]السَّلَامُ عَلَيْكُمْ\n[00:08]안녕하세요\n[00:12]Привет мир\n[00:15]नमस्ते";
+        Lines = Lyrics.Parse(Raw);
+        Provider = "DEMO · contoh bahasa, bukan lirik komersial";
+        PrepareLatin();
+        Changed?.Invoke();
+    }
     public void PrepareForUpdate()
     {
         preparingUpdate = true;
+        latinJob?.Cancel();
         lookup?.Cancel();
         Media.Dispose();
         Audio.Stop();
@@ -264,11 +319,11 @@ public sealed class PlayerState : IDisposable
     }
     public void Dispose()
     {
+        latinJob?.Cancel();
         lookup?.Cancel();
         Media.Dispose();
         Audio.Dispose();
         local.Close();
-        if (!Showcase)
-            Storage.Save(Settings);
+        if (!Showcase) Storage.Save(Settings);
     }
 }

@@ -13,6 +13,7 @@ public sealed class SavedSong
 }
 public sealed class Settings
 {
+    public bool ShowLatin { get; set; } = true;
     public IslandAppearance Appearance { get; set; } = new(); public bool Island { get; set; } = true; public bool Spectrum { get; set; } = true; public string Monitor { get; set; } = ""; public Dictionary<string, SavedSong> Songs { get; set; } = new();
 }
 public static class Storage

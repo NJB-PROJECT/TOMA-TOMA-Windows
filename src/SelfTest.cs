@@ -133,6 +133,23 @@ public static class SelfTest
         Test("Warna tidak valid jatuh ke warna aman", () => IslandBrushes.Color("invalid") == IslandBrushes.Color("#0B131C"));
         Test("Background hilang memakai warna dasar", () => IslandBrushes.Background(new() { Mode = "Image", ImagePath = "missing-file.png" }) is System.Windows.Media.SolidColorBrush);
         Test("Tema transparansi dan preset tersimpan", () => { var s = new Settings { Appearance = new() { Expanded = IslandStyle.Preset("Aurora") } }; s.Appearance.Expanded.Opacity = .65; var restored = JsonSerializer.Deserialize<Settings>(JsonSerializer.Serialize(s)); return restored?.Appearance.Expanded.Mode == "Gradient" && restored.Appearance.Expanded.Opacity == .65; });
+        using (var romanizer = new Romanizer())
+        {
+            Test("Latin: kanji Jepang memakai pembacaan Jepang", () => { var r = romanizer.Read("私は音楽が好きです"); return r.Text.Contains("ongaku") && r.Text.Contains("suki") && !r.Text.Contains("音"); });
+            Test("Latin: kanji saja mengikuti konteks Jepang", () => romanizer.Read("未来", "Japanese").Text == "mirai");
+            Test("Latin: Arab berharakat menjadi huruf Latin", () => { var r = romanizer.Read("سَلَام"); return r.Text.Contains("salam") && !r.Text.Contains("س"); });
+            Test("Latin: Arab tanpa harakat diberi batasan vokal", () => { var r = romanizer.Read("سلام عليكم"); return r.Text.Length > 0 && r.Note.Contains("tanpa harakat"); });
+            Test("Latin: Hangul dan Cyrillic terbaca", () => romanizer.Read("안녕하세요").Text.Contains("annyeong") && romanizer.Read("Привет мир").Text.Contains("Privet"));
+            Test("Latin: Mandarin tidak dianggap Jepang tanpa kana", () => romanizer.Read("你好").Text.Contains("ni"));
+            Test("Latin: lirik Latin sumber tidak diduplikasi", () => romanizer.Read("Hello world, 123!").Text == "");
+            Test("Latin: tanda baca dan campuran Inggris dipertahankan", () => romanizer.Read("音楽, Hello!", "Japanese").Text.Contains(", Hello!"));
+            Test("Latin: teks panjang dibatasi", () => romanizer.Read(new string('あ', 4097)).Text == "");
+            Test("Latin: anotasi tidak mengubah teks atau timestamp", () => { var a = new System.Collections.Generic.List<LyricLine> { new(1200, "未来"), new(3000, "こんにちは") }; var b = Romanizer.Annotate(a, CancellationToken.None); return b[0].Time == 1200 && b[0].Text == "未来" && b[0].Latin == "mirai" && a[0].Latin == "" && b[1].Time == 3000; });
+            Test("Latin: deteksi Jepang tidak mematikan baris Arab atau Korea", () => { var a = Romanizer.Annotate(new[] { new LyricLine(0, "こんにちは"), new LyricLine(1000, "سَلَام"), new LyricLine(2000, "안녕하세요") }, CancellationToken.None); return a.All(l => l.Latin.Length > 0) && a[1].Latin.Contains("salam"); });
+            Test("Latin: island mempertahankan pembungkusan cara baca panjang", () => { using var state = new PlayerState(true); var w = new IslandWindow(state, () => { }); try { w.CurrentLatin.Text = string.Join(" ", Enumerable.Repeat("cara baca panjang", 20)); w.CurrentLatin.Visibility = System.Windows.Visibility.Visible; w.CurrentLatin.Measure(new System.Windows.Size(300, double.PositiveInfinity)); return w.CurrentLatin.TextWrapping == System.Windows.TextWrapping.Wrap && w.CurrentLatin.DesiredSize.Height > 40; } finally { w.Close(); } });
+            Test("Latin: pembatalan menghentikan pekerjaan lama", () => { using var c = new CancellationTokenSource(); c.Cancel(); try { Romanizer.Annotate(new[] { new LyricLine(0, "こんにちは") }, c.Token); return false; } catch (OperationCanceledException) { return true; } });
+            Test("Latin: pengaturan tersimpan dan default aktif", () => JsonSerializer.Deserialize<Settings>("{}")!.ShowLatin && !JsonSerializer.Deserialize<Settings>(JsonSerializer.Serialize(new Settings { ShowLatin = false }))!.ShowLatin);
+        }
         UpdateTests.Run(Test);
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(output))!);
         File.WriteAllText(output, JsonSerializer.Serialize(new

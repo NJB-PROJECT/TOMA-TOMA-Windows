@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.1.0 — 2026-11-11
+- Offline automatic Latin reading annotations: Japanese kanji/kana via Kuromoji; Arabic, Korean and other supported scripts via Windows ICU.
+- Original text and timestamps preserved; Latin under original in the desktop/expanded island and preferred in the compact island.
+- Persistent display toggle, background processing, bounded cache and cancellation on lyric/song changes.
+- Explicit approximation/Arabic missing-vowel notices; no translation or fabricated synchronization.
+
+
 ## 2.0.0 — 2026-11-11
 - Rebrand to Lyrivane Desktop with generated mint/cyan ribbon logo and installer artwork.
 - Rebuilt listening workspace: focused lyric panel, separate transport card, progressive search/settings and dark scrollbars.

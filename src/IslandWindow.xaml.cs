@@ -37,6 +37,7 @@ public partial class IslandWindow : Window
         Foreground = IslandBrushes.Solid(theme.Text);
         MiniLine.Foreground = TrackTitle.Foreground = IslandBrushes.Solid(theme.Text);
         MiniTitle.Foreground = TrackArtist.Foreground = IslandBrushes.Solid(theme.Muted);
+        CurrentLatin.Foreground = IslandBrushes.Solid(theme.Muted);
         CurrentLine.Foreground = Progress.Foreground = IslandBrushes.Solid(theme.Accent);
         PlayButton.Background = IslandBrushes.Solid(theme.Accent);
         PlayButton.Foreground = IslandBrushes.Solid(theme.Background);
@@ -174,7 +175,11 @@ public partial class IslandWindow : Window
         string text = index >= 0 ? state.Lines[index].Text : state.Lines.Count > 0 && state.Lines[0].Time < 0 ? "Lirik tanpa timestamp · buka aplikasi untuk membaca" : state.Track == null ? "Musikmu. Lirikmu." : state.Raw.Length > 0 ? "♪" : state.Status;
         if (CurrentLine.Text != text)
             CurrentLine.Text = text;
-        MiniLine.Text = text;
+        string latin = index >= 0 ? state.Lines[index].Latin : "";
+        CurrentLatin.Text = latin;
+        CurrentLatin.ToolTip = index >= 0 ? state.Lines[index].LatinNote : "";
+        CurrentLatin.Visibility = latin.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+        MiniLine.Text = latin.Length > 0 ? latin : text;
         PlayButton.Content = state.Playing ? "Ⅱ" : "▶";
         Progress.Value = state.Track?.Duration > 0 ? Math.Clamp(state.Position / (state.Track.Duration * 10), 0, 100) : 0;
         Credit.Foreground = Ui.CreditBrush();

@@ -7,7 +7,11 @@ using System.Security.Cryptography;
 using System.Text;
 
 namespace Toma.Windows;
-public sealed record LyricLine(long Time, string Text);
+public sealed record LyricLine(long Time, string Text)
+{
+    public string Latin { get; init; } = "";
+    public string LatinNote { get; init; } = "";
+}
 public sealed class LyricRecord
 {
     public int Id

@@ -28,6 +28,7 @@ public partial class MainWindow : Window
         this.island = island;
         Height = Math.Max(MinHeight, Math.Min(780, SystemParameters.WorkArea.Height - 36));
         Width = Math.Max(MinWidth, Math.Min(1080, SystemParameters.WorkArea.Width - 48));
+        LatinCheck.IsChecked = state.Settings.ShowLatin;
         IslandCheck.IsChecked = state.Settings.Island;
         SpectrumCheck.IsChecked = state.Settings.Spectrum;
         foreach (var screen in System.Windows.Forms.Screen.AllScreens)
@@ -49,6 +50,7 @@ public partial class MainWindow : Window
         TrackTitle.Text = state.Track?.Title ?? "Putar musikmu";
         TrackArtist.Text = state.Track == null ? "Spotify · YouTube Music · pemutar Windows" : state.Track.Artist + " · " + Ui.SourceName(state.Track.Source);
         Art.Source = state.Cover;
+        LatinStatus.Text = !state.Settings.ShowLatin ? "" : state.PreparingLatin ? "Menyiapkan teks Latin di perangkat…" : state.Lines.Any(l => l.LatinNote.Contains("tanpa harakat")) ? "Latin perkiraan · Arab tanpa harakat: vokal dapat tidak lengkap" : state.Lines.Any(l => l.Latin.Length > 0) ? "Latin otomatis · perkiraan cara baca, bukan terjemahan" : state.Lines.Any(l => l.LatinNote.Length > 0) ? "Cara baca belum tersedia untuk sebagian baris." : "";
         StateLabel.Text = state.Track == null ? state.Media.Status : state.Status;
         Provider.Text = state.Provider.Length > 0 ? state.Provider + " · " + (state.Lines.Count > 0 && state.Lines[0].Time >= 0 ? "Lirik bertimestamp" : "Teks tanpa timestamp") : "LIRIK SAAT INI";
         if (shownKey != state.Track?.Key)
@@ -96,6 +98,10 @@ public partial class MainWindow : Window
             return;
         }
         state.SearchAs(TitleInput.Text, ArtistInput.Text);
+    }
+    private void LatinChanged(object sender, RoutedEventArgs e)
+    {
+        if (ready) state.SetLatin(LatinCheck.IsChecked == true);
     }
     private void AppearanceClick(object sender, RoutedEventArgs e)
     {
@@ -154,7 +160,7 @@ public partial class MainWindow : Window
             island.Show();
         else
             island.Hide();
-        Storage.Save(state.Settings);
+        if (!state.Showcase) Storage.Save(state.Settings);
     }
     private void SpectrumChanged(object sender, RoutedEventArgs e)
     {
@@ -167,7 +173,7 @@ public partial class MainWindow : Window
             return;
         state.Settings.Monitor = (MonitorBox.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "";
         island.Reposition();
-        Storage.Save(state.Settings);
+        if (!state.Showcase) Storage.Save(state.Settings);
     }
     private async void VersionClick(object sender, RoutedEventArgs e)
     {

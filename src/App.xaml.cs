@@ -15,6 +15,15 @@ public partial class App : System.Windows.Application
         base.OnStartup(e);
         ShutdownMode = ShutdownMode.OnExplicitShutdown;
         DispatcherUnhandledException += (_, error) => { FileLog.Write(error.Exception.ToString()); System.Windows.MessageBox.Show("Ada kendala. Detail disimpan di app.log pada folder data Lyrivane.", "Lyrivane"); error.Handled = true; };
+        if (e.Args.Contains("--latin-probe"))
+        {
+            int at = Array.IndexOf(e.Args, "--latin-probe");
+            using var engine = new Romanizer();
+            var examples = new[] { "私は音楽が好きです", "未来", "こんにちは", "السَّلَامُ عَلَيْكُمْ", "السلام عليكم", "안녕하세요", "Привет мир", "नमस्ते", "你好", "Hello world" };
+            var results = examples.Select(text => new { Original = text, Reading = engine.Read(text, text == "未来" ? "Japanese" : "Auto") }).ToArray();
+            File.WriteAllText(e.Args[at + 1], JsonSerializer.Serialize(results, new JsonSerializerOptions { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping }));
+            Shutdown(); return;
+        }
         if (e.Args.Contains("--update-probe"))
         {
             int at = Array.IndexOf(e.Args, "--update-probe");
@@ -37,9 +46,11 @@ public partial class App : System.Windows.Application
         if (e.Args.Contains("--design-preview"))
         {
             state = new PlayerState(true); state.ShowcaseFrame(0);
+            if (e.Args.Contains("--latin-demo")) state.ShowcaseLatin();
             island = new IslandWindow(state, () => main?.Show());
-            main = new MainWindow(state, island) { Title = "Lyrivane Desktop � Design preview (demo)" };
+            main = new MainWindow(state, island) { Title = "Lyrivane Desktop · Design preview (demo)" };
             MainWindow = main; main.Show();
+            if (e.Args.Contains("--latin-demo")) { island.Show(); island.ShowcaseExpand(true); }
             double time = 0;
             var demoTimer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromMilliseconds(50) };
             demoTimer.Tick += (_, _) => { time += .05; state.ShowcaseFrame(time % 18); };

@@ -49,6 +49,16 @@ L cyan–mint, R ungu–pink. Kapsul mempunyai 12 band per kanal; kartu besar 22
 
 > Klip di atas menampilkan komponen WPF aplikasi yang sebenarnya, dengan teks contoh original dan PCM sintetis berlabel **feature demo**. Klip ini ilustrasi fitur, bukan pengukuran latensi/FPS atau rekaman lagu komersial. [Versi video](docs/media/showcase.mp4).
 
+## Latin otomatis / cara baca
+
+Aktifkan **Latin otomatis · cara baca** pada Ruang lirik. Teks asli tetap tampil; tulisan Latin diletakkan di bawahnya dan memakai timestamp yang sama. Island besar menampilkan keduanya, kapsul memprioritaskan Latin agar mudah dinyanyikan. Pengaturan ini tersimpan.
+
+Pemrosesan sepenuhnya lokal dengan kamus Jepang Kuromoji serta ICU Windows. Tidak memerlukan API key atau mengunggah lirik. Konversi berjalan di background dengan cache; lirik asli segera tersedia sambil Latin disiapkan. Latin yang sudah ada di sumber tetap dipertahankan.
+
+- Jepang (kana/kanji), Arab, Korea, Mandarin, Cyrillic, Yunani dan beberapa aksara Indic didukung oleh mesin yang tersedia. Pembacaan kanji ditentukan dengan kamus/konteks teks; nama, bahasa gaul, dan pelafalan khusus lagu dapat berbeda.
+- **Arab tanpa harakat:** teks Latin dapat kehilangan vokal, misalnya `السلام` menjadi `alslam`. Ini transliterasi tulisan, bukan restorasi vokal atau analisis audio. Aplikasi menandainya sebagai perkiraan. Untuk bernyanyi dengan pelafalan lengkap, pilih sumber berharakat/romanisasi yang tepat atau impor LRC tersebut.
+- Teks cara baca bukan terjemahan. Tidak semua bahasa/aksara atau pelafalan penyanyi bisa dijamin. Timestamp yang tidak tersedia di sumber tetap tidak dibuat-buat.
+
 ## Apa yang tersedia?
 
 | Fitur | Perilaku |
@@ -56,6 +66,7 @@ L cyan–mint, R ungu–pink. Kapsul mempunyai 12 band per kanal; kartu besar 22
 | Deteksi lagu | Mengikuti judul, artis, sampul dan posisi dari sesi media Windows yang kompatibel |
 | Lirik otomatis | LRCLIB untuk timestamp; lyrics.ovh sebagai cadangan teks biasa |
 | Pemilihan versi | Memilih alternatif ketika judul/artis/durasi belum cukup meyakinkan |
+| Latin otomatis | Transliterasi offline di bawah teks asli, checkbox aktif/nonaktif, waktu yang sama |
 | Auto-sync | Baris aktif mengikuti posisi, jeda dan seek pemutar; koreksi waktu ±250 ms |
 | LRC lokal | Impor `.lrc`/`.txt`, klik baris bertimestamp untuk seek |
 | Pemutar eksternal | Spotify, YouTube Music di browser/PWA, dan pemutar yang mengekspos sesi media Windows |
