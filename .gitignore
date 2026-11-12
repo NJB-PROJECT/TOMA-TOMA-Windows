@@ -30,3 +30,5 @@ update-state.json
 *.dpapi
 pronunciation-cache/
 gemini-probe*.json
+
+gemini-rate-state.json

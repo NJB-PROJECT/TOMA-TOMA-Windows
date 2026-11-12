@@ -13,3 +13,5 @@
 - Opening a music link launches the external browser/player, which has its own data practices.
 - `--probe` and `--lyrics-probe` create local diagnostic files only when explicitly invoked. They can contain track metadata. Review before sharing. The app never automatically submits logs.
 - Public feature clips use original example text and generated PCM in isolated showcase mode. They contain no personal playback history.
+
+- Since 2.2.1, generation requests are serialized and paced, with song-change debounce and repeated-line deduplication. `gemini-rate-state.json` stores cooldown times scoped by a SHA-256 fingerprint of key/model, never the key itself. Temporary resumes are bounded; daily quota blocks wait for provider/Pacific daily reset. Identical lyric documents can reuse pronunciation despite metadata or timestamp changes.

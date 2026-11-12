@@ -1,3 +1,15 @@
+# Validation — Lyrivane Desktop 2.2.1
+
+- Self-contained Release publish: no warnings/errors. **117 automated checks, 0 failures**.
+- New deterministic tests verify Retry-After, fractional RetryInfo, daily reset in Pacific time, malformed error fallback, pacing with a fake clock, cancellation during debounce, cooldown persistence without plaintext keys, HTTP 429 blocking a second request, cached lyrics during cooldown, larger batches and chorus deduplication.
+- A 150-line unique fixture used three requests, each at most 64 rows. A 100-line identical chorus fixture used one request containing one unique row. Legacy caches were promoted and reused for different metadata/timestamps without another request.
+- Production generation has one in-flight request and a 20-second minimum start interval per key/model. A 3-second debounce avoids spending requests on rapidly skipped tracks. 429 state persists by a hashed key/model scope; temporary resumes are capped at two for the current song, daily quotas are not retried each minute.
+- Quota tests use simulated responses and consume no real Gemini quota. This does not increase Google's project quota or guarantee that a depleted daily quota is restored. Existing original text/timestamps and encrypted key storage remain unchanged.
+- Windows Installer upgrade 2.2.0 → 2.2.1 completed with exit code 0; settings and encrypted-key hashes unchanged; installed EXE version 2.2.1.0 matches the payload hash.
+- No Android changes, credentials or private pronunciation/rate caches are part of the release.
+
+---
+
 # Validation — Lyrivane Desktop 2.2.0
 
 - Self-contained Release publish completed without warnings/errors. **105 automated checks, 0 failures**.

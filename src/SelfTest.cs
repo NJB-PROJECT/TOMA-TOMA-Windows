@@ -151,6 +151,7 @@ public static class SelfTest
             Test("Latin: pengaturan tersimpan dan default aktif", () => JsonSerializer.Deserialize<Settings>("{}")!.ShowLatin && !JsonSerializer.Deserialize<Settings>(JsonSerializer.Serialize(new Settings { ShowLatin = false }))!.ShowLatin);
         }
         GeminiTests.Run(Test);
+        GeminiRateTests.Run(Test);
         UpdateTests.Run(Test);
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(output))!);
         File.WriteAllText(output, JsonSerializer.Serialize(new

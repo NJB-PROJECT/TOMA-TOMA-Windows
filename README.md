@@ -60,6 +60,12 @@ Bahasa Vietnam sudah memakai huruf Latin, tetapi pengucapannya berbeda. Mode **A
 
 Gemini OFF secara default. Ketika aktif, teks lirik, judul dan artis dikirim ke Google; audio tidak dikirim. Kuota/biaya mengikuti akunmu. Key disimpan terpisah dengan Windows DPAPI, tidak di settings/log/GitHub. Hasil dicache lokal per model dan sumber; baris aktif diprioritaskan, hasil batch divalidasi berdasarkan ID, dan timestamp asli tetap utuh. Gagal jaringan, kuota atau output tidak valid tidak menggantikan lirik dengan hasil palsu. Tombol **Coba ulang AI** melanjutkan baris yang belum dicache. [Privasi](PRIVACY.md).
 
+### Hemat kuota & rate limit (2.2.1)
+
+Satu permintaan aktif, jeda minimal 20 detik antarpanggilan, dan debounce 3 detik sebelum mengirim lagu yang baru dipilih. Hingga 64 baris diproses per panggilan, dengan batas ukuran; chorus sama cukup diproses sekali. Cache yang cocok dapat digunakan walau judul/artis/timestamp berbeda.
+
+Jika Google mengirim 429, aplikasi mengikuti `Retry-After`/`RetryInfo`, menyimpan waktu tunggunya, dan tidak mengirim ulang selama jeda. Jeda sementara dapat dilanjutkan otomatis maksimal dua kali untuk lagu yang sama; mengganti lagu membatalkan pekerjaan lama. Kuota harian dibedakan dan menunggu reset Google, tidak terus dicoba tiap menit. Cache dan Latin lokal tetap tersedia. Tombol **Kuota AI Studio** membuka halaman kuota akunmu. Fitur ini mengurangi pemakaian, bukan menambah atau menjamin tersedianya kuota Google.
+
 ## Latin lokal / cara baca
 
 Aktifkan **Latin otomatis · cara baca** pada Ruang lirik. Teks asli tetap tampil; tulisan Latin diletakkan di bawahnya dan memakai timestamp yang sama. Island besar menampilkan keduanya, kapsul memprioritaskan Latin agar mudah dinyanyikan. Pengaturan ini tersimpan.

@@ -17,6 +17,7 @@ public sealed class PlayerState : IDisposable
         get;
     }
     private CancellationTokenSource? latinJob;
+    private int quotaRetries;
     public bool PreparingLatin { get; private set; }
     private double showcasePosition; public MediaService Media { get; } = new(); public AudioSpectrum Audio { get; } = new();
     private readonly LyricsClient client = new(); private CancellationTokenSource? lookup; private readonly MediaPlayer local = new(); private bool localMode, localPlaying, preparingUpdate; private string lastExternal = ""; private int offset;
@@ -75,11 +76,23 @@ public sealed class PlayerState : IDisposable
                     if (!Current()) return;
                     Lines = updated; LatinMessage = $"Cara baca AI · Gemini · {done}/{total} baris · perkiraan";
                     Changed?.Invoke();
-                }, cancel);
+                }, cancel, message => { if (Current()) { LatinMessage = message; Changed?.Invoke(); } });
                 if (Current()) { int available = Lines.Count(l => l.LatinNote.StartsWith("Cara baca AI")); LatinMessage = $"Cara baca AI · {available}/{Lines.Count} baris · perkiraan pengucapan Indonesia"; }
             }
         }
         catch (OperationCanceledException) { if (Current()) { AiPronunciationFailed = true; LatinMessage = "Gemini terlalu lama merespons · coba ulang AI"; } }
+        catch (GeminiRateLimited ex)
+        {
+            if (Current())
+            {
+                AiPronunciationFailed = true; LatinMessage = ex.Message + " Lirik/cache tetap tersedia."; Changed?.Invoke();
+                var wait = ex.Until - DateTimeOffset.UtcNow;
+                if (!ex.Daily && quotaRetries < 2 && wait > TimeSpan.Zero && wait <= TimeSpan.FromMinutes(10))
+                {
+                    try { quotaRetries++; await Task.Delay(wait + TimeSpan.FromSeconds(1), cancel); if (Current()) { latinJob = null; PrepareLatin(); } } catch (OperationCanceledException) { }
+                }
+            }
+        }
         catch (GeminiFailure ex) { if (Current()) { AiPronunciationFailed = true; LatinMessage = ex.Message + " Latin lokal tetap tersedia."; } }
         catch (Exception ex) { if (Current()) { AiPronunciationFailed = true; LatinMessage = "Cara baca AI belum tersedia · periksa koneksi lalu coba ulang"; FileLog.Write("Latin processing: " + ex.GetType().Name); } }
         finally { if (ReferenceEquals(latinJob, job)) { latinJob = null; PreparingLatin = false; Changed?.Invoke(); } job.Dispose(); }
@@ -126,6 +139,7 @@ public sealed class PlayerState : IDisposable
         lookup?.Cancel();
         latinJob?.Cancel();
         PreparingLatin = false; LatinMessage = ""; AiPronunciationFailed = false;
+        quotaRetries = 0;
         Track = track;
         Choices = new();
         Raw = "";

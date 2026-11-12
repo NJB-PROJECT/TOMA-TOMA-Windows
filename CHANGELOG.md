@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.2.1 — 2026-11-12
+- Serialize and pace Gemini generation calls (20-second minimum interval, 3-second song stability debounce).
+- Increase batches to 64 rows with a character cap, deduplicate identical chorus lines and reuse identical lyric documents across metadata/timing changes.
+- Parse Retry-After/RetryInfo and daily quota identifiers; persist 429 cooldowns, distinguish daily reset from temporary limits, and bound automatic resumption.
+- Cache/local lyrics remain usable during cooldown; add an AI Studio quota link.
+
+
 ## 2.2.0 — 2026-11-12
 - Optional Google AI Studio Gemini pronunciation in Indonesian-style phonetic spelling, including Latin-script languages such as Vietnamese.
 - User-owned DPAPI-encrypted key, model discovery, sample test, explicit cloud opt-in, local result cache and retry.
