@@ -1,3 +1,16 @@
+# Validation — Lyrivane Desktop 2.2.0
+
+- Self-contained Release publish completed without warnings/errors. **105 automated checks, 0 failures**.
+- New checks cover Gemini model/endpoint validation, row ID mapping and missing/duplicate/foreign IDs, ASCII pronunciation format, request-key placement, cache reuse, preserved timestamps/text, cancellation, sanitized provider errors, DPAPI round-trip and default cloud opt-out.
+- Live Google AI Studio integration tested with the user's own locally entered key (never exposed to tools/logs). `gemini-3.5-flash` initially returned HTTP 503. `gemini-3.5-flash-lite` subsequently produced valid structured pronunciation rows for Vietnamese, Japanese, Arabic and Russian sample text. Earlier unrecognised Japanese sample result was explicitly unsupported; local dictionary fallback is retained. No claim of universal language/dialect accuracy is made.
+- Gemini settings allow account model discovery, hidden key entry, encrypted per-user key storage and a Vietnamese sample test. Only safe result/error metadata appears in diagnostics. Sample text is original/common greeting material, not commercial song lyrics.
+- Unsupported AI rows retain local readings and are not cached as completed pronunciation; a subsequent retry is tested. AI status is cleared on song changes so missing lyrics do not display a previous song's completion state.
+- Existing original lyrics, timings and offline display remain available during generation and failures. Expanded island labels the current source/failure and provides retry. AI is OFF for existing users until enabled with their own key; this tester opted in directly.
+- Real MSI upgrade from installed 2.1.0 to 2.2.0 completed with exit code 0. Existing settings and encrypted key file hashes were unchanged; installed EXE and privacy documentation match the release payload.
+- No Android files or private credentials/cache are included in this repository/release.
+
+---
+
 # Validation — Lyrivane Desktop 2.1.0
 
 - Release self-contained publish: zero warnings/errors. Executable **89 checks, 0 failures**.

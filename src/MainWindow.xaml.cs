@@ -50,7 +50,7 @@ public partial class MainWindow : Window
         TrackTitle.Text = state.Track?.Title ?? "Putar musikmu";
         TrackArtist.Text = state.Track == null ? "Spotify · YouTube Music · pemutar Windows" : state.Track.Artist + " · " + Ui.SourceName(state.Track.Source);
         Art.Source = state.Cover;
-        LatinStatus.Text = !state.Settings.ShowLatin ? "" : state.PreparingLatin ? "Menyiapkan teks Latin di perangkat…" : state.Lines.Any(l => l.LatinNote.Contains("tanpa harakat")) ? "Latin perkiraan · Arab tanpa harakat: vokal dapat tidak lengkap" : state.Lines.Any(l => l.Latin.Length > 0) ? "Latin otomatis · perkiraan cara baca, bukan terjemahan" : state.Lines.Any(l => l.LatinNote.Length > 0) ? "Cara baca belum tersedia untuk sebagian baris." : "";
+        LatinStatus.Text = !state.Settings.ShowLatin ? "" : state.Lines.Count == 0 && state.Settings.GeminiEnabled ? "Gemini siap · menunggu lirik ditemukan" : state.LatinMessage;
         StateLabel.Text = state.Track == null ? state.Media.Status : state.Status;
         Provider.Text = state.Provider.Length > 0 ? state.Provider + " · " + (state.Lines.Count > 0 && state.Lines[0].Time >= 0 ? "Lirik bertimestamp" : "Teks tanpa timestamp") : "LIRIK SAAT INI";
         if (shownKey != state.Track?.Key)
@@ -99,6 +99,8 @@ public partial class MainWindow : Window
         }
         state.SearchAs(TitleInput.Text, ArtistInput.Text);
     }
+    private void GeminiClick(object sender, RoutedEventArgs e) => new GeminiWindow(state) { Owner = this }.ShowDialog();
+    private void RetryLatinClick(object sender, RoutedEventArgs e) => state.RefreshLatin();
     private void LatinChanged(object sender, RoutedEventArgs e)
     {
         if (ready) state.SetLatin(LatinCheck.IsChecked == true);

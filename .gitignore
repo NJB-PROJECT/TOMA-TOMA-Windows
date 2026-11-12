@@ -26,3 +26,7 @@ installer-payload/
 *.msi
 SHA256SUMS.txt
 update-state.json
+
+*.dpapi
+pronunciation-cache/
+gemini-probe*.json

@@ -37,7 +37,7 @@ public partial class IslandWindow : Window
         Foreground = IslandBrushes.Solid(theme.Text);
         MiniLine.Foreground = TrackTitle.Foreground = IslandBrushes.Solid(theme.Text);
         MiniTitle.Foreground = TrackArtist.Foreground = IslandBrushes.Solid(theme.Muted);
-        CurrentLatin.Foreground = IslandBrushes.Solid(theme.Muted);
+        CurrentLatin.Foreground = ReadingStatus.Foreground = IslandBrushes.Solid(theme.Muted);
         CurrentLine.Foreground = Progress.Foreground = IslandBrushes.Solid(theme.Accent);
         PlayButton.Background = IslandBrushes.Solid(theme.Accent);
         PlayButton.Foreground = IslandBrushes.Solid(theme.Background);
@@ -176,6 +176,9 @@ public partial class IslandWindow : Window
         if (CurrentLine.Text != text)
             CurrentLine.Text = text;
         string latin = index >= 0 ? state.Lines[index].Latin : "";
+        string note = index >= 0 ? state.Lines[index].LatinNote : "";
+        ReadingStatus.Text = state.Settings.GeminiEnabled && state.AiPronunciationFailed ? "AI belum tersedia · memakai Latin lokal. Buka aplikasi / coba AI ↻." : state.Settings.GeminiEnabled && state.PreparingLatin && !note.StartsWith("Cara baca AI") ? "AI sedang menyiapkan cara baca Indonesia…" : note;
+        ReadingStatus.Visibility = state.Settings.ShowLatin && ReadingStatus.Text.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
         CurrentLatin.Text = latin;
         CurrentLatin.ToolTip = index >= 0 ? state.Lines[index].LatinNote : "";
         CurrentLatin.Visibility = latin.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
@@ -184,6 +187,7 @@ public partial class IslandWindow : Window
         Progress.Value = state.Track?.Duration > 0 ? Math.Clamp(state.Position / (state.Track.Duration * 10), 0, 100) : 0;
         Credit.Foreground = Ui.CreditBrush();
     }
+    private void RetryPronunciation(object sender, RoutedEventArgs e) => state.RefreshLatin();
     private void ShowChoices()
     {
         if (!state.Settings.Island)

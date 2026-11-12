@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.2.0 — 2026-11-12
+- Optional Google AI Studio Gemini pronunciation in Indonesian-style phonetic spelling, including Latin-script languages such as Vietnamese.
+- User-owned DPAPI-encrypted key, model discovery, sample test, explicit cloud opt-in, local result cache and retry.
+- Active-line-first batches with strict row ID validation, cancellation, bounded requests and offline fallback; original lyrics/timing preserved.
+- Vietnamese no longer silently skipped as already-readable Latin.
+
+
 ## 2.1.0 — 2026-11-11
 - Offline automatic Latin reading annotations: Japanese kanji/kana via Kuromoji; Arabic, Korean and other supported scripts via Windows ICU.
 - Original text and timestamps preserved; Latin under original in the desktop/expanded island and preferred in the compact island.

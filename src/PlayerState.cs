@@ -45,31 +45,44 @@ public sealed class PlayerState : IDisposable
         PrepareLatin();
         Changed?.Invoke();
     }
+    public string LatinMessage { get; private set; } = "";
+    public bool AiPronunciationFailed { get; private set; }
+    public void RefreshLatin() { PrepareLatin(); Changed?.Invoke(); }
     private async void PrepareLatin()
     {
-        latinJob?.Cancel();
-        PreparingLatin = false;
-        if (!Settings.ShowLatin)
-        {
-            Lines = Lines.Select(l => l with { Latin = "", LatinNote = "" }).ToList();
-            return;
-        }
-        var source = Lines;
-        var job = new CancellationTokenSource();
-        latinJob = job;
-        var cancel = job.Token;
-        PreparingLatin = source.Count > 0;
+        latinJob?.Cancel(); PreparingLatin = false; LatinMessage = ""; AiPronunciationFailed = false;
+        if (!Settings.ShowLatin) { Lines = Lines.Select(l => l with { Latin = "", LatinNote = "" }).ToList(); return; }
+        var source = Lines; var song = Track;
+        if (source.Count == 0) return;
+        var job = new CancellationTokenSource(); latinJob = job; var cancel = job.Token;
+        bool Current() => !cancel.IsCancellationRequested && ReferenceEquals(latinJob, job) && Track?.Key == song?.Key && !preparingUpdate;
+        PreparingLatin = true; LatinMessage = "Menyiapkan Latin lokal…";
         try
         {
             var annotated = await Task.Run(() => Romanizer.Annotate(source, cancel), cancel);
-            if (cancel.IsCancellationRequested || !ReferenceEquals(Lines, source) || preparingUpdate) return;
+            if (!Current()) return;
             Lines = annotated;
-            PreparingLatin = false;
+            LatinMessage = annotated.Any(l => l.LatinNote.Contains("Vietnam")) ? "Bahasa Vietnam · aktifkan Gemini untuk cara baca Indonesia" : annotated.Any(l => l.LatinNote.Contains("tanpa harakat")) ? "Latin lokal · Arab tanpa harakat: vokal dapat tidak lengkap" : annotated.Any(l => l.Latin.Length > 0) ? "Latin lokal · perkiraan cara baca, bukan terjemahan" : "";
             Changed?.Invoke();
+            if (Settings.GeminiEnabled && !Showcase)
+            {
+                string key = GeminiSecret.Read();
+                if (key.Length == 0) { AiPronunciationFailed = true; LatinMessage = "Gemini belum tersambung · masukkan API key di pengaturan AI"; return; }
+                LatinMessage = "Gemini menyiapkan cara baca Indonesia…"; Changed?.Invoke();
+                var ai = new GeminiPhonetics();
+                await ai.Annotate(key, Settings.GeminiModel, song?.Title ?? "", song?.Artist ?? "", annotated, Active, (updated, done, total) =>
+                {
+                    if (!Current()) return;
+                    Lines = updated; LatinMessage = $"Cara baca AI · Gemini · {done}/{total} baris · perkiraan";
+                    Changed?.Invoke();
+                }, cancel);
+                if (Current()) { int available = Lines.Count(l => l.LatinNote.StartsWith("Cara baca AI")); LatinMessage = $"Cara baca AI · {available}/{Lines.Count} baris · perkiraan pengucapan Indonesia"; }
+            }
         }
-        catch (OperationCanceledException) { }
-        catch (Exception ex) { if (!cancel.IsCancellationRequested && ReferenceEquals(Lines, source)) { PreparingLatin = false; FileLog.Write("Latin annotation: " + ex.GetType().Name); Changed?.Invoke(); } }
-        finally { if (ReferenceEquals(latinJob, job)) latinJob = null; job.Dispose(); }
+        catch (OperationCanceledException) { if (Current()) { AiPronunciationFailed = true; LatinMessage = "Gemini terlalu lama merespons · coba ulang AI"; } }
+        catch (GeminiFailure ex) { if (Current()) { AiPronunciationFailed = true; LatinMessage = ex.Message + " Latin lokal tetap tersedia."; } }
+        catch (Exception ex) { if (Current()) { AiPronunciationFailed = true; LatinMessage = "Cara baca AI belum tersedia · periksa koneksi lalu coba ulang"; FileLog.Write("Latin processing: " + ex.GetType().Name); } }
+        finally { if (ReferenceEquals(latinJob, job)) { latinJob = null; PreparingLatin = false; Changed?.Invoke(); } job.Dispose(); }
     }
     public async Task Start()
     {
@@ -89,7 +102,7 @@ public sealed class PlayerState : IDisposable
             {
                 lookup?.Cancel();
                 latinJob?.Cancel();
-                PreparingLatin = false;
+                PreparingLatin = false; LatinMessage = ""; AiPronunciationFailed = false;
                 Track = null;
                 Raw = "";
                 Lines = new();
@@ -112,7 +125,7 @@ public sealed class PlayerState : IDisposable
     {
         lookup?.Cancel();
         latinJob?.Cancel();
-        PreparingLatin = false;
+        PreparingLatin = false; LatinMessage = ""; AiPronunciationFailed = false;
         Track = track;
         Choices = new();
         Raw = "";

@@ -150,6 +150,7 @@ public static class SelfTest
             Test("Latin: pembatalan menghentikan pekerjaan lama", () => { using var c = new CancellationTokenSource(); c.Cancel(); try { Romanizer.Annotate(new[] { new LyricLine(0, "こんにちは") }, c.Token); return false; } catch (OperationCanceledException) { return true; } });
             Test("Latin: pengaturan tersimpan dan default aktif", () => JsonSerializer.Deserialize<Settings>("{}")!.ShowLatin && !JsonSerializer.Deserialize<Settings>(JsonSerializer.Serialize(new Settings { ShowLatin = false }))!.ShowLatin);
         }
+        GeminiTests.Run(Test);
         UpdateTests.Run(Test);
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(output))!);
         File.WriteAllText(output, JsonSerializer.Serialize(new

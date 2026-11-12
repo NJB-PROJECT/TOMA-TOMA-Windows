@@ -14,6 +14,8 @@ public sealed class SavedSong
 public sealed class Settings
 {
     public bool ShowLatin { get; set; } = true;
+    public bool GeminiEnabled { get; set; }
+    public string GeminiModel { get; set; } = "gemini-3.5-flash-lite";
     public IslandAppearance Appearance { get; set; } = new(); public bool Island { get; set; } = true; public bool Spectrum { get; set; } = true; public string Monitor { get; set; } = ""; public Dictionary<string, SavedSong> Songs { get; set; } = new();
 }
 public static class Storage
@@ -24,6 +26,7 @@ public static class Storage
         try
         {
             var settings = JsonSerializer.Deserialize<Settings>(File.ReadAllText(Path.Combine(DirectoryPath, "settings.json"))) ?? new();
+            settings.GeminiModel ??= "gemini-3.5-flash-lite";
             settings.Appearance ??= new();
             settings.Appearance.Compact ??= new();
             settings.Appearance.Expanded ??= new();

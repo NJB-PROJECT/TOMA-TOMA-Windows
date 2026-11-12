@@ -15,6 +15,21 @@ public partial class App : System.Windows.Application
         base.OnStartup(e);
         ShutdownMode = ShutdownMode.OnExplicitShutdown;
         DispatcherUnhandledException += (_, error) => { FileLog.Write(error.Exception.ToString()); System.Windows.MessageBox.Show("Ada kendala. Detail disimpan di app.log pada folder data Lyrivane.", "Lyrivane"); error.Handled = true; };
+        if (e.Args.Contains("--gemini-probe"))
+        {
+            int at = Array.IndexOf(e.Args, "--gemini-probe");
+            var settings = Storage.Load();
+            if (e.Args.Length > at + 2) settings.GeminiModel = GeminiPhonetics.ValidModel(e.Args[at + 2]);
+            var source = new[] { new LyricLine(1000, "Xin chào, tôi thích âm nhạc."), new LyricLine(3000, "私は音楽が好きです"), new LyricLine(5000, "السلام عليكم"), new LyricLine(7000, "Привет, как дела?") };
+            try
+            {
+                var rows = await new GeminiPhonetics().Convert(GeminiSecret.Read(), settings.GeminiModel, "Contoh pengucapan", "", source, new[] { 0, 1, 2, 3 }, CancellationToken.None);
+                File.WriteAllText(e.Args[at + 1], JsonSerializer.Serialize(new { Success = true, settings.GeminiModel, Rows = rows }, new JsonSerializerOptions { WriteIndented = true }));
+            }
+            catch (GeminiFailure failure) { File.WriteAllText(e.Args[at + 1], JsonSerializer.Serialize(new { Success = false, Error = failure.Message })); }
+            catch { File.WriteAllText(e.Args[at + 1], "{\"Success\":false,\"Error\":\"Connection failed\"}"); }
+            Shutdown(); return;
+        }
         if (e.Args.Contains("--latin-probe"))
         {
             int at = Array.IndexOf(e.Args, "--latin-probe");
@@ -148,6 +163,7 @@ public partial class App : System.Windows.Application
         main.Show();
         if (state.Settings.Island)
             island.Show();
+        if (e.Args.Contains("--open-gemini")) _ = Dispatcher.BeginInvoke(new Action(() => new GeminiWindow(state) { Owner = main }.ShowDialog()));
         await state.Start();
         updateTimer.Tick += async (_, _) => await CheckUpdates(false);updateTimer.Start();
     }

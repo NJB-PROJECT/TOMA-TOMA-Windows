@@ -22,6 +22,8 @@ public sealed class Romanizer : IDisposable
     private static readonly Regex JapaneseRun = new("[\\u3041-\\u30ff\\u3400-\\u9fff々〆ヶー]+", RegexOptions.Compiled);
     private static readonly Regex Arabic = new("[\\u0620-\\u064a\\u066e-\\u06d3]", RegexOptions.Compiled);
     private static readonly Regex NonLatin = new("[\\u0370-\\u052f\\u0590-\\u08ff\\u0900-\\u0e7f\\u3040-\\u30ff\\u3400-\\u9fff\\uac00-\\ud7af]", RegexOptions.Compiled);
+    private static readonly Regex Vietnamese = new("[ăâđêôơưĂÂĐÊÔƠƯạảấầẩẫậắằẳẵặẹẻẽếềểễệịỉĩọỏốồổỗộớờởỡợụủũứừửữựỵỷỹ]", RegexOptions.Compiled);
+    public static bool IsVietnamese(string text) => Vietnamese.IsMatch(text);
     private IntPtr general, kana;
     public static string Detect(IEnumerable<LyricLine> lines) => lines.Any(l => Kana.IsMatch(l.Text)) ? "Japanese" : "Auto";
     public static List<LyricLine> Annotate(IReadOnlyList<LyricLine> lines, CancellationToken cancel)
@@ -39,7 +41,7 @@ public sealed class Romanizer : IDisposable
     }
     public LatinReading Read(string source, string hint = "Auto")
     {
-        if (string.IsNullOrWhiteSpace(source) || !NonLatin.IsMatch(source)) return new("", "");
+        if (string.IsNullOrWhiteSpace(source) || (!NonLatin.IsMatch(source) && !IsVietnamese(source))) return new("", "");
         if (source.Length > 4096) return new("", "Baris terlalu panjang untuk Latin otomatis.");
         string key = hint + "|" + source;
         if (Cache.TryGetValue(key, out var saved)) return saved;
@@ -57,6 +59,7 @@ public sealed class Romanizer : IDisposable
             value = Regex.Replace(value, @"\s+", " ").Trim();
             bool partial = NonLatin.IsMatch(value);
             string note = partial ? "Latin otomatis · sebagian pembacaan belum dikenali" : "Latin otomatis · perkiraan cara baca";
+            if (IsVietnamese(source)) note = "Ejaan Vietnam disederhanakan · aktifkan Gemini untuk cara baca Indonesia";
             if (Arabic.IsMatch(source) && !Regex.IsMatch(source, "[\\u064b-\\u0652]"))
                 note = "Latin perkiraan · sumber Arab tanpa harakat; vokal dapat tidak lengkap";
             if (value == source || string.IsNullOrWhiteSpace(value)) result = new("", "Cara baca belum tersedia untuk baris ini.");

@@ -1,6 +1,9 @@
 # Data & privacy
 
-- No account, API key, telemetry, analytics, or automatic cloud backup is built into TOMA TOMA.
+- Lyrivane does not include a shared API key, telemetry, analytics, or automatic cloud backup.
+- Optional Gemini pronunciation (2.2.0): OFF by default. When you enable it with your own Google AI Studio key, current song lyric text, title and artist are sent directly to `https://generativelanguage.googleapis.com` to create Indonesian-style pronunciation. Audio and other songs/settings are not sent. Google policies, quotas and charges apply. Model listing and the sample test also contact this host when clicked.
+- Your Gemini key is stored separately as `gemini-key.dpapi`, encrypted with Windows DPAPI for the current Windows account. It is never included in settings JSON, request URLs, logs, diagnostic output, repository or installers. The AI settings dialog can remove it and disable Gemini.
+- Generated pronunciation is cached locally in `pronunciation-cache`, keyed by model/prompt/source hash. The app reuses cached lines, processes current lines first and cancels outstanding work on song/lyric changes. At most 600 eligible lines are processed per run. Disable Gemini to use offline transliteration only. This is approximate pronunciation, not universal language accuracy or translation.
 - Since 1.6.1, the updater contacts the public GitHub Releases API for this repository on startup and periodically. It sends the app updater User-Agent, not playback metadata or a user identifier. GitHub receives normal network request information. Installer downloads use GitHub release/CDN hosts.
 - `update-state.json` caches the last validated stable release under the local data folder; downloaded MSI files stay under its `updates/<version>/` subfolder. Installers are only launched after an explicit Update button click and hash/size verification. No silent update install or system-wide enforcement is performed.
 - Track title, artist and duration are sent to `https://lrclib.net` for lyric lookup. The fallback provider `https://api.lyrics.ovh` receives artist/title. Their independent privacy policies and availability apply.

@@ -49,7 +49,18 @@ L cyan–mint, R ungu–pink. Kapsul mempunyai 12 band per kanal; kartu besar 22
 
 > Klip di atas menampilkan komponen WPF aplikasi yang sebenarnya, dengan teks contoh original dan PCM sintetis berlabel **feature demo**. Klip ini ilustrasi fitur, bukan pengukuran latensi/FPS atau rekaman lagu komersial. [Versi video](docs/media/showcase.mp4).
 
-## Latin otomatis / cara baca
+## AI Gemini / cara baca Indonesia
+
+Bahasa Vietnam sudah memakai huruf Latin, tetapi pengucapannya berbeda. Mode **AI · Gemini** memproses juga bahasa Latin seperti Vietnam, Inggris, Prancis, dan bahasa lain yang dikenali model, menjadi ejaan panduan bunyi untuk penutur Indonesia. Ini bukan terjemahan dan bukan jaminan akurasi semua bahasa/dialek.
+
+1. Buka **AI · Gemini** pada Ruang lirik.
+2. Masukkan API key milikmu dari Google AI Studio, lalu **Muat model dari akun**.
+3. Pilih model yang tersedia (awal: `gemini-3.5-flash-lite`; `gemini-3.5-flash` juga bisa dipilih jika tersedia).
+4. **Uji contoh Vietnam**, aktifkan AI, lalu **Simpan & gunakan**.
+
+Gemini OFF secara default. Ketika aktif, teks lirik, judul dan artis dikirim ke Google; audio tidak dikirim. Kuota/biaya mengikuti akunmu. Key disimpan terpisah dengan Windows DPAPI, tidak di settings/log/GitHub. Hasil dicache lokal per model dan sumber; baris aktif diprioritaskan, hasil batch divalidasi berdasarkan ID, dan timestamp asli tetap utuh. Gagal jaringan, kuota atau output tidak valid tidak menggantikan lirik dengan hasil palsu. Tombol **Coba ulang AI** melanjutkan baris yang belum dicache. [Privasi](PRIVACY.md).
+
+## Latin lokal / cara baca
 
 Aktifkan **Latin otomatis · cara baca** pada Ruang lirik. Teks asli tetap tampil; tulisan Latin diletakkan di bawahnya dan memakai timestamp yang sama. Island besar menampilkan keduanya, kapsul memprioritaskan Latin agar mudah dinyanyikan. Pengaturan ini tersimpan.
 
