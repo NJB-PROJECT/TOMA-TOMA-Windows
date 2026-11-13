@@ -185,7 +185,6 @@ public partial class IslandWindow : Window
         MiniLine.Text = latin.Length > 0 ? latin : text;
         PlayButton.Content = state.Playing ? "Ⅱ" : "▶";
         Progress.Value = state.Track?.Duration > 0 ? Math.Clamp(state.Position / (state.Track.Duration * 10), 0, 100) : 0;
-        Credit.Foreground = Ui.CreditBrush();
     }
     private void RetryPronunciation(object sender, RoutedEventArgs e) => state.RefreshLatin();
     private void ShowChoices()

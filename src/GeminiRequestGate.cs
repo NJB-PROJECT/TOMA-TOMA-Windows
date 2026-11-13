@@ -14,7 +14,7 @@ public sealed class GeminiRateLimited : GeminiFailure
 {
     public DateTimeOffset Until { get; }
     public bool Daily { get; }
-    public GeminiRateLimited(DateTimeOffset until, bool daily) : base(daily ? "Kuota harian Gemini habis. Jeda sampai " + until.ToLocalTime().ToString("dd MMM HH:mm") + "." : "Gemini dibatasi sementara. Tunggu sampai " + until.ToLocalTime().ToString("HH:mm:ss") + ".") { Until = until; Daily = daily; }
+    public GeminiRateLimited(DateTimeOffset until, bool daily, string provider = "gemini") : base(daily ? "Kuota harian " + AiProviders.Label(provider) + " habis. Jeda sampai " + until.ToLocalTime().ToString("dd MMM HH:mm") + "." : AiProviders.Label(provider) + " dibatasi sementara. Tunggu sampai " + until.ToLocalTime().ToString("HH:mm:ss") + ".") { Until = until; Daily = daily; }
 }
 internal sealed record GeminiQuota(DateTimeOffset Until, bool Daily);
 internal sealed class GeminiRequestGate
@@ -46,7 +46,7 @@ internal sealed class GeminiRequestGate
         await serial.WaitAsync(cancel);
         try
         {
-            if (blocked.TryGetValue(scope, out var quota) && quota.Until > now()) throw new GeminiRateLimited(quota.Until, quota.Daily);
+            if (blocked.TryGetValue(scope, out var quota) && quota.Until > now()) throw new GeminiRateLimited(quota.Until, quota.Daily, model.StartsWith("groq:") ? "groq" : model.StartsWith("openrouter:") ? "openrouter" : "gemini");
             if (next.TryGetValue(scope, out var ready) && ready > now()) { status?.Invoke("Antrean Gemini · jeda hemat kuota sampai " + ready.ToLocalTime().ToString("HH:mm:ss")); await delay(ready - now(), cancel); }
             cancel.ThrowIfCancellationRequested();
             next[scope] = now() + interval;
@@ -54,14 +54,14 @@ internal sealed class GeminiRequestGate
         }
         catch { serial.Release(); throw; }
     }
-    internal GeminiRateLimited Limit(string key, string model, HttpResponseMessage response, string body)
+    internal GeminiRateLimited Limit(string key, string model, HttpResponseMessage response, string body, string provider = "gemini")
     {
-        var quota = Parse(response, body, now()); blocked[Scope(key, model)] = quota; Save();
-        return new GeminiRateLimited(quota.Until, quota.Daily);
+        var quota = Parse(response, body, now(), provider); blocked[Scope(key, model)] = quota; Save();
+        return new GeminiRateLimited(quota.Until, quota.Daily, provider);
     }
-    internal static GeminiQuota Parse(HttpResponseMessage response, string body, DateTimeOffset now)
+    internal static GeminiQuota Parse(HttpResponseMessage response, string body, DateTimeOffset now, string provider = "gemini")
     {
-        bool daily = false; TimeSpan wait = TimeSpan.FromSeconds(60);
+        bool daily = false, explicitReset = false; TimeSpan wait = TimeSpan.FromSeconds(60);
         if (response.Headers.RetryAfter?.Delta is TimeSpan delta && delta > wait) wait = delta;
         if (response.Headers.RetryAfter?.Date is DateTimeOffset date && date - now > wait) wait = date - now;
         try
@@ -83,10 +83,23 @@ internal sealed class GeminiRequestGate
             }
         }
         catch { }
-        DateTimeOffset until = now + (wait > TimeSpan.FromDays(2) ? TimeSpan.FromDays(2) : wait);
-        if (daily)
+        if (provider != "gemini")
         {
-            var pacific = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
+            if (response.Headers.TryGetValues("x-ratelimit-remaining-requests", out var remaining) && long.TryParse(System.Linq.Enumerable.FirstOrDefault(remaining), out var count) && count == 0)
+            {
+                daily = true;
+                if (response.Headers.TryGetValues("x-ratelimit-reset-requests", out var resetHeaders))
+                {
+                    double seconds = 0; foreach (Match m in Regex.Matches(System.Linq.Enumerable.FirstOrDefault(resetHeaders) ?? "", @"(\d+(?:\.\d+)?)(ms|s|m|h|d)")) seconds += double.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture) * (m.Groups[2].Value switch { "ms" => .001, "m" => 60, "h" => 3600, "d" => 86400, _ => 1 });
+                    if (seconds > 0) explicitReset = true; if (seconds > wait.TotalSeconds) wait = TimeSpan.FromSeconds(Math.Min(seconds, 172800));
+                }
+            }
+            try { using var doc = JsonDocument.Parse(body); string message = doc.RootElement.GetProperty("error").GetProperty("message").GetString() ?? ""; daily |= message.Contains("daily", StringComparison.OrdinalIgnoreCase) || message.Contains("per day", StringComparison.OrdinalIgnoreCase); } catch { }
+        }
+        DateTimeOffset until = now + (wait > TimeSpan.FromDays(2) ? TimeSpan.FromDays(2) : wait);
+        if (daily && (provider == "gemini" || !explicitReset))
+        {
+            var pacific = provider == "gemini" ? TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time") : TimeZoneInfo.Utc;
             var tomorrow = TimeZoneInfo.ConvertTime(now, pacific).Date.AddDays(1);
             var reset = new DateTimeOffset(TimeZoneInfo.ConvertTimeToUtc(tomorrow, pacific), TimeSpan.Zero);
             if (reset > until) until = reset;

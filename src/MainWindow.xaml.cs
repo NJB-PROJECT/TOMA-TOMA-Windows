@@ -77,7 +77,6 @@ public partial class MainWindow : Window
         PlayButton.Content = state.Playing ? "Ⅱ Jeda" : "▶ Putar";
         Clock.Text = Ui.Time(state.Position) + " / " + Ui.Time((state.Track?.Duration ?? 0) * 1000);
         OffsetLabel.Text = $"{state.Offset:+0;-0;0} ms";
-        Credit.Foreground = Ui.CreditBrush();
         int index = state.Active;
         if (index != lastIndex)
         {

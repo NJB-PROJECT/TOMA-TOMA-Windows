@@ -49,14 +49,19 @@ L cyan–mint, R ungu–pink. Kapsul mempunyai 12 band per kanal; kartu besar 22
 
 > Klip di atas menampilkan komponen WPF aplikasi yang sebenarnya, dengan teks contoh original dan PCM sintetis berlabel **feature demo**. Klip ini ilustrasi fitur, bukan pengukuran latensi/FPS atau rekaman lagu komersial. [Versi video](docs/media/showcase.mp4).
 
-## AI Gemini / cara baca Indonesia
+## AI & cadangan / cara baca Indonesia
 
-Bahasa Vietnam sudah memakai huruf Latin, tetapi pengucapannya berbeda. Mode **AI · Gemini** memproses juga bahasa Latin seperti Vietnam, Inggris, Prancis, dan bahasa lain yang dikenali model, menjadi ejaan panduan bunyi untuk penutur Indonesia. Ini bukan terjemahan dan bukan jaminan akurasi semua bahasa/dialek.
+Bahasa Vietnam sudah memakai huruf Latin, tetapi pengucapannya berbeda. Mode **AI & cadangan** memproses juga bahasa Latin seperti Vietnam, Inggris, Prancis, dan bahasa lain yang dikenali model, menjadi ejaan panduan bunyi untuk penutur Indonesia. Ini bukan terjemahan dan bukan jaminan akurasi semua bahasa/dialek.
 
-1. Buka **AI · Gemini** pada Ruang lirik.
+Urutan otomatis: **Gemini → Groq → OpenRouter**. Isi key milikmu untuk setiap penyedia yang ingin dipakai. Penyedia tanpa key atau dinonaktifkan dilewati. OpenRouter dibatasi `openrouter/free` / model `:free` dan harga rute $0; kuota masing-masing penyedia tetap berlaku. Tidak ada key bersama atau janji layanan gratis tanpa batas. Groq/Gemini mengikuti paket akunmu.
+
+1. Buka **AI & cadangan** pada Ruang lirik.
 2. Masukkan API key milikmu dari Google AI Studio, lalu **Muat model dari akun**.
 3. Pilih model yang tersedia (awal: `gemini-3.5-flash-lite`; `gemini-3.5-flash` juga bisa dipilih jika tersedia).
 4. **Uji contoh Vietnam**, aktifkan AI, lalu **Simpan & gunakan**.
+5. Pilih Groq/OpenRouter untuk menambahkan cadangan; tombol **Buat key sendiri** membuka situs penyedia. Key disimpan terenkripsi dengan DPAPI.
+
+Versi 2.3 menghapus watermark pada ruang lirik dan Island. Cadangan Groq/OpenRouter telah diuji dengan fixture lokal; pengujian akun nyata memerlukan key pengguna.
 
 Gemini OFF secara default. Ketika aktif, teks lirik, judul dan artis dikirim ke Google; audio tidak dikirim. Kuota/biaya mengikuti akunmu. Key disimpan terpisah dengan Windows DPAPI, tidak di settings/log/GitHub. Hasil dicache lokal per model dan sumber; baris aktif diprioritaskan, hasil batch divalidasi berdasarkan ID, dan timestamp asli tetap utuh. Gagal jaringan, kuota atau output tidak valid tidak menggantikan lirik dengan hasil palsu. Tombol **Coba ulang AI** melanjutkan baris yang belum dicache. [Privasi](PRIVACY.md).
 

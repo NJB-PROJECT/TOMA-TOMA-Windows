@@ -15,3 +15,5 @@
 - Public feature clips use original example text and generated PCM in isolated showcase mode. They contain no personal playback history.
 
 - Since 2.2.1, generation requests are serialized and paced, with song-change debounce and repeated-line deduplication. `gemini-rate-state.json` stores cooldown times scoped by a SHA-256 fingerprint of key/model, never the key itself. Temporary resumes are bounded; daily quota blocks wait for provider/Pacific daily reset. Identical lyric documents can reuse pronunciation despite metadata or timestamp changes.
+
+- Since 2.3.0, optional pronunciation failover is Gemini → Groq (`https://api.groq.com`) → OpenRouter (`https://openrouter.ai`). Only enabled providers with user-supplied keys receive lyric text/title/artist; audio is never sent. Every provider is tried at most once per batch, and each quota cooldown is respected. Keys are stored separately as `<provider>-key.dpapi`, encrypted with CurrentUser DPAPI. OpenRouter is restricted to free model IDs and a zero-price routing limit. Free tiers have limits; provider account terms still apply. Existing Gemini keys remain valid without migration.

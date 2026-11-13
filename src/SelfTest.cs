@@ -152,6 +152,7 @@ public static class SelfTest
         }
         GeminiTests.Run(Test);
         GeminiRateTests.Run(Test);
+        AiProviderTests.Run(Test);
         UpdateTests.Run(Test);
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(output))!);
         File.WriteAllText(output, JsonSerializer.Serialize(new

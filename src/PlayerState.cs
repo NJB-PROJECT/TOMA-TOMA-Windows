@@ -67,20 +67,20 @@ public sealed class PlayerState : IDisposable
             Changed?.Invoke();
             if (Settings.GeminiEnabled && !Showcase)
             {
-                string key = GeminiSecret.Read();
-                if (key.Length == 0) { AiPronunciationFailed = true; LatinMessage = "Gemini belum tersambung · masukkan API key di pengaturan AI"; return; }
-                LatinMessage = "Gemini menyiapkan cara baca Indonesia…"; Changed?.Invoke();
+                var chain = new AiFailover(Settings);
+                string key = "provider-chain";
+                LatinMessage = "AI menyiapkan cara baca Indonesia…"; Changed?.Invoke();
                 var ai = new GeminiPhonetics();
                 await ai.Annotate(key, Settings.GeminiModel, song?.Title ?? "", song?.Artist ?? "", annotated, Active, (updated, done, total) =>
                 {
                     if (!Current()) return;
-                    Lines = updated; LatinMessage = $"Cara baca AI · Gemini · {done}/{total} baris · perkiraan";
+                    Lines = updated; LatinMessage = $"Cara baca AI · {done}/{total} baris · perkiraan";
                     Changed?.Invoke();
-                }, cancel, message => { if (Current()) { LatinMessage = message; Changed?.Invoke(); } });
+                }, cancel, message => { if (Current()) { LatinMessage = message; Changed?.Invoke(); } }, (ids, token) => chain.Batch(song?.Title ?? "", song?.Artist ?? "", annotated, ids, token, message => { if (Current()) { LatinMessage = message; Changed?.Invoke(); } }));
                 if (Current()) { int available = Lines.Count(l => l.LatinNote.StartsWith("Cara baca AI")); LatinMessage = $"Cara baca AI · {available}/{Lines.Count} baris · perkiraan pengucapan Indonesia"; }
             }
         }
-        catch (OperationCanceledException) { if (Current()) { AiPronunciationFailed = true; LatinMessage = "Gemini terlalu lama merespons · coba ulang AI"; } }
+        catch (OperationCanceledException) { if (Current()) { AiPronunciationFailed = true; LatinMessage = "Penyedia AI terlalu lama merespons · coba ulang AI"; } }
         catch (GeminiRateLimited ex)
         {
             if (Current())

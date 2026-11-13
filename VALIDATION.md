@@ -1,3 +1,11 @@
+## 2.3.0 — provider backups and watermark removal
+
+- Windows build: 0 warnings/errors; 123/123 offline self-tests passed. Added checks for Gemini quota → Groq fallback, missing-key skip, cancellation, free-route allowlist, and explicit Groq reset time.
+- MSI 2.3.0 upgrade returned 0. Installed executable version/hash match the published payload; existing settings and encrypted Gemini key hashes were unchanged.
+- Native WPF showcase regenerated and desktop layout inspected; no lyric credit watermark. Demo text/PCM only.
+- Groq/OpenRouter live-account calls were not performed: user has no keys yet. Free-tier availability and generated pronunciation accuracy are not guaranteed.
+- Android is maintained separately and is not part of this public Windows repository or release.
+
 # Validation — Lyrivane Desktop 2.2.1
 
 - Self-contained Release publish: no warnings/errors. **117 automated checks, 0 failures**.

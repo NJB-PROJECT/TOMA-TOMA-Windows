@@ -1,3 +1,9 @@
+# 2.3.0
+
+- Add Gemini → Groq → OpenRouter pronunciation failover with per-provider encrypted keys, free-model restrictions and quota cooldowns.
+- Remove visible lyric credit watermark from the desktop and Island.
+- Preserve existing settings, Gemini key, lyric timestamps and updater compatibility.
+
 # Changelog
 
 ## 2.2.1 — 2026-11-12
